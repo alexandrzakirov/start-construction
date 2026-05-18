@@ -892,16 +892,18 @@ function render() {
 }
 
 function renderHeader(alerts) {
-  const pill = document.getElementById('alertPill');
-  const dot = document.getElementById('complianceDot');
-  if (alerts.length > 0) {
-    pill.style.display = 'block';
-    pill.textContent = alerts.length + ' alert' + (alerts.length > 1 ? 's' : '');
-    dot.style.display = 'block';
-  } else {
-    pill.style.display = 'none';
-    dot.style.display = 'none';
-  }
+    const pill = document.getElementById('alertPill');
+    const dot = document.getElementById('complianceDot');
+    if (alerts.length > 0) {
+      if (pill) {
+        pill.style.display = 'block';
+        pill.textContent = alerts.length + ' alert' + (alerts.length > 1 ? 's' : '');
+      }
+      if (dot) dot.style.display = 'block';
+    } else {
+      if (pill) pill.style.display = 'none';
+      if (dot) dot.style.display = 'none';
+    }
 }
 
 function renderDashboard(alerts) {
