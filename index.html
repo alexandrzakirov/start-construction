@@ -8,9 +8,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Start Const.">
   <meta name="mobile-web-app-capable" content="yes">
-<link rel="manifest" href="/start-construction/manifest.json">
-  <link rel="apple-touch-icon" href="/start-construction/icon-192.svg">
-  <link rel="icon" href="/start-construction/icon-192.svg">
+<link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./icon-192.svg">
+  <link rel="icon" href="./icon-192.svg">
 <title>Start Construction, Inc.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -158,6 +158,25 @@ body{height:100%;overflow:hidden;background:#dde0e4;color:#1a1e24;font-family:'S
 .alert-text{font-size:13px;font-weight:700}
 .alert-sub{font-size:11px;color:var(--muted2);font-family:var(--mono);margin-top:2px}
 
+
+/* ── SUPPLEMENTAL UI FIXES ───────────────────────────── */
+.section-head{font-size:11px;font-family:var(--mono);font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:1px;padding:10px 16px 8px}
+.links-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 14px}
+.link-tile{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;text-decoration:none;color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.link-icon{font-size:24px;margin-bottom:6px}.link-label{font-size:13px;font-weight:700}.link-url{font-size:10px;color:var(--muted2);font-family:var(--mono);margin-top:3px;overflow:hidden;text-overflow:ellipsis}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border)}.row:last-child{border-bottom:0}.row-label{font-size:13px;font-weight:700}.row-sub{font-size:11px;color:var(--muted2);font-family:var(--mono);margin-top:3px}.row-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.btn{border:1px solid var(--border);background:#fff;color:var(--text);border-radius:8px;padding:10px 12px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;text-align:center}.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn-ghost{background:#fff}.btn-danger{background:var(--red);border-color:var(--red);color:#fff}.btn-full{width:100%;display:block}.btn-sm{font-size:11px;padding:6px 9px}
+.field{margin-bottom:14px}.field-label{display:block;font-size:10px;font-family:var(--mono);font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px}input,select,textarea{width:100%;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text);font:14px 'Syne',sans-serif;padding:11px;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:flex-end;justify-content:center}.modal-overlay.open{display:flex}.modal-sheet{width:100%;max-width:560px;max-height:90vh;overflow:auto;background:var(--surface);border-radius:18px 18px 0 0;padding:8px 16px 18px}.modal-handle{width:44px;height:4px;border-radius:2px;background:var(--border2);margin:4px auto 14px}.modal-title{font-size:18px;font-weight:800}.modal-head{margin-bottom:14px}.modal-body{padding-bottom:8px}
+.toast{position:fixed;left:50%;bottom:calc(74px + var(--safe-bottom));transform:translateX(-50%) translateY(20px);background:#111;color:#fff;border-radius:20px;padding:10px 16px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:.2s;z-index:20000}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.filter-btn{border:1px solid var(--border);background:#fff;border-radius:20px;padding:7px 11px;font-size:11px;font-weight:700;white-space:nowrap}.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.file-item{background:#fff;border:1px solid var(--border);border-radius:10px;margin:0 16px 10px;padding:12px}.file-header{display:flex;gap:10px;align-items:flex-start}.file-cat-icon{font-size:22px}.file-info{flex:1;min-width:0}.file-name{font-size:13px;font-weight:800;word-break:break-word}.file-meta{font-size:10px;color:var(--muted2);font-family:var(--mono);margin-top:3px}.file-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.empty-vault{padding:20px 16px;color:var(--muted2);font-size:13px;font-family:var(--mono)}
+@media (min-width:720px){.app{max-width:520px;margin:0 auto;border-left:1px solid var(--border);border-right:1px solid var(--border)}.modal-overlay{align-items:center}.modal-sheet{border-radius:18px}}
+
+</style>
+</head>
+<body>
+<script>
 function loadVault() {
   try {
     const r = localStorage.getItem(GDRIVE_KEY);
@@ -231,7 +250,19 @@ function renderGDriveVault() {
 }
 
 function renderRequiredDocsList() { const docs = loadVault(); const list = document.getElementById('vaultRequiredList'); if (!list) return; const linked = new Set(docs.map(d => REQUIRED_DOCS.find(r => r.id === d.id)?.id).filter(Boolean)); let reqHtml = `<div style="padding: 16px; border-bottom: 1px solid var(--border);">\n      <div style="font-size: 13px; color: var(--muted); margin-bottom: 12px; font-weight: 600;">📋 REQUIRED DOCUMENTS — ${linked.size}/${REQUIRED_DOCS.length}</div>\n      <div style="display: grid; gap: 8px;">`; reqHtml += REQUIRED_DOCS.map(req => { const hasDoc = linked.has(req.id); return `<div style="display: flex; align-items: center; gap: 8px; padding: 8px; background: ${hasDoc ? 'rgba(22, 102, 56, 0.1)' : 'rgba(181, 42, 28, 0.05)'}; border-radius: 6px; font-size: 12px;"> <span style="font-size: 16px;">${hasDoc ? '✓' : '✗'}</span> <span>${req.label}</span> ${!hasDoc ? `<button class="btn btn-sm btn-primary" onclick="openAddDocModal()" style="margin-left: auto;">+</button>` : ''} </div>`; }).join(''); reqHtml += `</div></div>`; list.innerHTML = reqHtml; }
-    <!-- DASHBOARD PAGE -->
+    
+</script>
+<div class="app">
+  <div class="status-bar"></div>
+  <header class="top-header">
+    <div class="header-left">
+      <div class="header-logo">SC</div>
+      <div><div class="header-title">Start Construction</div><div class="header-sub">Compliance Dashboard</div></div>
+    </div>
+    <div class="alert-pill" id="alertPill" style="display:none">0 alerts</div>
+  </header>
+  <div class="scroll-area" id="scrollArea">
+<!-- DASHBOARD PAGE -->
     <div class="page active" id="page-dashboard">
       <div id="dashAlerts"></div>
 
@@ -1222,7 +1253,7 @@ function resetData() {
 
 // ── SERVICE WORKER ────────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/start-construction/sw.js').catch(() => {});
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
 
 

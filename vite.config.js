@@ -1,12 +1,16 @@
 import { defineConfig } from 'vite'
 import { resolve } from 'path'
 
+// GitHub Pages publishes project sites under /REPOSITORY_NAME/.
+// For this repo the public URL should be:
+// https://YOUR_USERNAME.github.io/start-construction/
 export default defineConfig({
+  base: '/start-construction/',
   root: './',
   build: {
     outDir: 'dist',
     emptyOutDir: true,
-    minify: 'terser',
+    minify: true,
     sourcemap: false,
     rollupOptions: {
       input: {

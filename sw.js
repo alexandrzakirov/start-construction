@@ -1,26 +1,45 @@
-const ASSETS = [
-  '/start-construction/',
-  '/start-construction/index.html',
-  '/start-construction/manifest.json',
-  '/start-construction/sw.js',
-  '/start-construction/icon-192.svg',
-  '/start-construction/icon-512.svg'
+const CACHE_NAME = 'start-construction-v2';
+const BASE_PATH = new URL('./', self.registration.scope).pathname;
+
+const APP_SHELL = [
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-192.svg',
+  './icon-512.svg',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
-const CACHE_NAME = 'sc-cache-v1';
-
-self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
+self.addEventListener('install', (event) => {
   self.skipWaiting();
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)).catch(() => null)
+  );
 });
 
-self.addEventListener('activate', (e) => {
-  e.waitUntil(self.clients.claim());
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)))
+    ).then(() => self.clients.claim())
+  );
 });
 
-self.addEventListener('fetch', (e) => {
-  const url = new URL(e.request.url);
-  if (ASSETS.includes(url.pathname) || ASSETS.includes(url.pathname + '/')) {
-    e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
-  }
+self.addEventListener('fetch', (event) => {
+  const request = event.request;
+  const url = new URL(request.url);
+
+  if (request.method !== 'GET') return;
+  if (url.origin !== self.location.origin) return;
+
+  event.respondWith(
+    caches.match(request).then((cached) => {
+      return cached || fetch(request).then((response) => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy)).catch(() => null);
+        return response;
+      }).catch(() => caches.match('./index.html'));
+    })
+  );
 });
