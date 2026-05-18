@@ -1,9 +1,6 @@
 import { defineConfig } from 'vite'
 import { resolve } from 'path'
 
-// GitHub Pages publishes project sites under /REPOSITORY_NAME/.
-// For this repo the public URL should be:
-// https://YOUR_USERNAME.github.io/start-construction/
 export default defineConfig({
   base: '/start-construction/',
   root: './',
@@ -13,9 +10,7 @@ export default defineConfig({
     minify: true,
     sourcemap: false,
     rollupOptions: {
-      input: {
-        main: resolve(__dirname, 'index.html')
-      },
+      input: { main: resolve(__dirname, 'index.html') },
       output: {
         entryFileNames: 'js/[name]-[hash].js',
         chunkFileNames: 'js/[name]-[hash].js',
@@ -23,15 +18,6 @@ export default defineConfig({
       }
     }
   },
-  server: {
-    port: 5173,
-    open: true,
-    cors: true
-  },
-  preview: {
-    port: 4173
-  },
-  define: {
-    __VERSION__: JSON.stringify(process.env.npm_package_version)
-  }
+  server: { port: 5173, open: true, cors: true },
+  preview: { port: 4173 }
 })
