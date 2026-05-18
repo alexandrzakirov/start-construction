@@ -1,0 +1,2384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#dde0e4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Start Const.">
+  <meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./icon-192.svg">
+  <link rel="icon" href="./icon-192.svg">
+<title>Start Construction, Inc.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & BASE ─────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{height:100%;overflow:hidden}
+body{height:100%;overflow:hidden;background:#dde0e4;color:#1a1e24;font-family:'Syne',sans-serif;-webkit-font-smoothing:antialiased}
+
+/* ── VARIABLES ───────────────────────────────────────── */
+:root{
+  --bg:#dde0e4;--surface:#e8eaed;--surface2:#d4d7db;
+  --border:#c2c6cc;--border2:#adb2ba;
+  --accent:#b56e00;--accent-dim:rgba(181,110,0,.13);
+  --green:#166638;--green-dim:rgba(22,102,56,.13);
+  --red:#b52a1c;--red-dim:rgba(181,42,28,.13);
+  --yellow:#7a5500;--yellow-dim:rgba(122,85,0,.13);
+  --blue:#1450a0;--blue-dim:rgba(20,80,160,.13);
+  --text:#1a1e24;--muted:#7a8390;--muted2:#4a5260;
+  --mono:'JetBrains Mono',monospace;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+
+/* ── LAYOUT ──────────────────────────────────────────── */
+.app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+
+/* STATUS BAR FILL */
+.status-bar{
+  height:var(--safe-top);
+  background:var(--surface);
+  flex-shrink:0;
+}
+
+/* TOP HEADER */
+.top-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px 12px;
+  background:#e8eaed;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.header-left{display:flex;align-items:center;gap:10px}
+.header-logo{
+  width:34px;height:34px;border-radius:8px;
+  background:var(--accent-dim);border:1px solid rgba(245,166,35,.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;color:var(--accent);
+}
+.header-title{font-size:15px;font-weight:800}
+.header-sub{font-size:10px;color:var(--muted2);font-family:var(--mono)}
+.alert-pill{
+  background:var(--red);color:#fff;
+  font-size:11px;font-weight:700;font-family:var(--mono);
+  padding:4px 10px;border-radius:20px;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+
+/* SCROLL AREA */
+.scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+
+/* BOTTOM NAV */
+.bottom-nav{
+  display:flex;
+  flex-direction:row;
+  background:#e8eaed;
+  border-top:1px solid var(--border);
+  padding-bottom:var(--safe-bottom);
+  flex-shrink:0;
+  overflow-x:auto;
+  overflow-y:hidden;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+  scroll-snap-type:x mandatory;
+}
+.bottom-nav::-webkit-scrollbar{display:none}
+.nav-btn{
+  flex:0 0 auto;
+  min-width:64px;
+  display:flex;flex-direction:column;align-items:center;
+  gap:2px;padding:8px 4px 6px;
+  background:none;border:none;color:var(--muted2);
+  font-size:9px;font-family:'Syne',sans-serif;font-weight:600;
+  cursor:pointer;transition:color .15s;position:relative;
+  -webkit-tap-highlight-color:transparent;
+  scroll-snap-align:start;
+}
+.nav-btn.active{color:var(--accent)}
+.nav-btn .nav-icon{font-size:20px;line-height:1}
+.nav-dot{
+  position:absolute;top:8px;right:calc(50% - 16px);
+  width:8px;height:8px;border-radius:50%;
+  background:var(--red);border:2px solid var(--surface);
+}
+
+/* ── PAGE BASE ───────────────────────────────────────── */
+.page{display:none;padding:0}
+.page.active{display:block}
+
+.page-hero{
+  padding:20px 16px 16px;
+  background:linear-gradient(180deg,#f2f4f6 0%,transparent 100%);
+  border-bottom:1px solid var(--border);
+  margin-bottom:16px;
+}
+.page-tag{font-size:10px;font-family:var(--mono);color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.page-title{font-size:24px;font-weight:800}
+
+.px{padding-left:16px;padding-right:16px}
+
+/* ── CARDS ───────────────────────────────────────────── */
+.card{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:0 16px 14px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.card-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:13px;font-weight:700}
+.card-sub{font-size:10px;color:var(--muted2);font-family:var(--mono);margin-top:2px}
+.card-body{padding:16px}
+
+/* ── STAT ROW ────────────────────────────────────────── */
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px;margin-bottom:14px}
+.stat-box{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.stat-label{font-size:9px;font-family:var(--mono);color:var(--muted2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.stat-value{font-size:22px;font-weight:800;line-height:1}
+.stat-sub{font-size:10px;color:var(--muted2);font-family:var(--mono);margin-top:4px}
+
+/* ── PROGRESS ────────────────────────────────────────── */
+.progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;border-radius:2px;transition:width .5s}
+
+/* ── BADGES ──────────────────────────────────────────── */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-family:var(--mono);font-weight:600;padding:3px 7px;border-radius:3px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.badge-ok{background:var(--green-dim);color:var(--green)}
+.badge-warning{background:var(--yellow-dim);color:var(--yellow)}
+.badge-critical{background:var(--red-dim);color:var(--red)}
+.badge-expired{background:var(--red-dim);color:var(--red);border:1px solid var(--red)}
+.badge-empty{background:var(--border);color:var(--muted2)}
+.badge-blue{background:var(--blue-dim);color:var(--blue)}
+
+/* ── ALERT BANNERS ───────────────────────────────────── */
+.alert-banner{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:8px;margin:0 16px 10px;border:1px solid}
+.alert-banner.critical{background:var(--red-dim);border-color:rgba(240,92,92,.3)}
+.alert-banner.warning{background:var(--yellow-dim);border-color:rgba(245,200,66,.3)}
+.alert-banner.ok{background:var(--green-dim);border-color:rgba(61,214,140,.3)}
+.alert-icon{font-size:20px;flex-shrink:0}
+.alert-text{font-size:13px;font-weight:700}
+.alert-sub{font-size:11px;color:var(--muted2);font-family:var(--mono);margin-top:2px}
+
+function loadVault() {
+  try {
+    const r = localStorage.getItem(GDRIVE_KEY);
+    return r ? JSON.parse(r) : [...GDRIVE_DOCS];
+  } catch { return [...GDRIVE_DOCS]; }
+}
+
+function saveVault(files) {
+  try { localStorage.setItem(GDRIVE_KEY, JSON.stringify(files)); } catch(e) { showToast('⚠ Storage full — delete old documents'); }
+}
+
+function getFileExt(name) { return (name.split('.').pop() || '').toLowerCase(); }
+function getFileIcon(name) { return FILE_ICONS[getFileExt(name)] || '📁'; }
+function fmtSize(bytes) { if (bytes < 1024) return bytes + ' B'; if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB'; return (bytes/1024/1024).toFixed(1) + ' MB'; }
+
+function handleFileUpload(event) { event.target.value = ''; openAddDocModal(); }
+function downloadFile(id) { const vault = loadVault(); const file = vault.find(f => f.id === id); if (!file) return; if (file.url) window.open(file.url.replace('/preview',''),'_blank'); }
+function viewFile(id) { const vault = loadVault(); const file = vault.find(f => f.id === id); if (!file) return; if (file.url) viewGDriveDoc(file.url); }
+
+function deleteFile(id) { if (!confirm('Delete this document?')) return; const vault = loadVault().filter(f => f.id !== id); saveVault(vault); showToast('🗑 Deleted'); renderVault(); }
+function changeCat(id, newCat) { const vault = loadVault(); const file = vault.find(f => f.id === id); if (file) { file.category = newCat; saveVault(vault); renderVault(); } }
+
+function renderVault() { renderGDriveVault(); }
+
+function convertGDriveLink(url) {
+  if (!url) return '';
+  const fileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  const openMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  const docsMatch = url.match(/\/document\/d\/([a-zA-Z0-9_-]+)/);
+  const sheetsMatch = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+  const slidesMatch = url.match(/\/presentation\/d\/([a-zA-Z0-9_-]+)/);
+  const id = (fileMatch || openMatch || docsMatch || sheetsMatch || slidesMatch)?.[1];
+  if (id) return `https://drive.google.com/file/d/${id}/preview`;
+  return url;
+}
+
+function viewGDriveDoc(url) { if (!url) { alert('No Google Drive link added yet.\nUpload to drive.google.com and paste the share link.'); return; } window.open(url, '_blank'); }
+
+function openAddDocModal() { const modal = document.getElementById('gdriveAddModal'); if (!modal) return showToast('Modal not found'); document.getElementById('gdriveName').value = ''; document.getElementById('gdriveCategory').value = 'Formation'; document.getElementById('gdriveUrl').value = ''; document.getElementById('gdriveNotes').value = ''; document.getElementById('gdriveCurrentId').value = ''; modal.style.display = 'flex'; }
+function closeAddDocModal() { const modal = document.getElementById('gdriveAddModal'); if (modal) modal.style.display = 'none'; }
+
+function saveGDriveDoc() {
+  const name = document.getElementById('gdriveName')?.value?.trim();
+  const category = document.getElementById('gdriveCategory')?.value || 'Other';
+  let url = document.getElementById('gdriveUrl')?.value?.trim() || '';
+  const notes = document.getElementById('gdriveNotes')?.value?.trim() || '';
+  const currentId = document.getElementById('gdriveCurrentId')?.value || '';
+  if (!name) return showToast('Enter document name');
+  url = convertGDriveLink(url);
+  const docs = loadVault();
+  if (currentId) { const doc = docs.find(d => String(d.id) === String(currentId)); if (doc) { doc.name = name; doc.category = category; doc.url = url; doc.notes = notes; doc.addedAt = doc.addedAt || new Date().toISOString(); saveVault(docs); closeAddDocModal(); renderVault(); showToast('✓ Document updated'); return; } }
+  const id = Date.now() + Math.floor(Math.random()*1000);
+  docs.push({ id, name, category, url, notes, addedAt: new Date().toISOString() }); saveVault(docs); closeAddDocModal(); renderVault(); showToast('✓ Document added');
+}
+
+function editGDriveDoc(id) { const docs = loadVault(); const doc = docs.find(d => d.id === id); if (!doc) return; document.getElementById('gdriveName').value = doc.name; document.getElementById('gdriveCategory').value = doc.category; document.getElementById('gdriveUrl').value = doc.url; document.getElementById('gdriveNotes').value = doc.notes; document.getElementById('gdriveCurrentId').value = id; const modal = document.getElementById('gdriveAddModal'); if (modal) modal.style.display = 'flex'; }
+
+function renderGDriveVault() {
+  let docs = loadVault();
+  const search = (document.getElementById('vaultSearch')?.value || '').toLowerCase();
+  if (vaultFilter !== 'All') docs = docs.filter(d => d.category === vaultFilter);
+  if (search) docs = docs.filter(d => (d.name||'').toLowerCase().includes(search) || (d.notes||'').toLowerCase().includes(search));
+  const allDocs = loadVault();
+  const cats = FILE_CATEGORIES.filter(c => c === 'All' || allDocs.some(d => d.category === c));
+  document.getElementById('vaultFilters').innerHTML = cats.map(c => `<button class="filter-btn ${vaultFilter === c ? 'active' : ''}" onclick="vaultFilter='${c}';renderGDriveVault()">${c}</button>`).join('');
+  const info = document.getElementById('storageInfo'); if (info) info.textContent = allDocs.length + ' document' + (allDocs.length !== 1 ? 's' : '');
+  const list = document.getElementById('vaultFileList'); if (!list) return;
+  if (!docs.length) { list.innerHTML = '<div class="empty-vault">📂 No documents yet. Click "Add Document" to link files from Google Drive.</div>'; renderRequiredDocsList(); return; }
+  list.innerHTML = docs.map(doc => `\n    <div class="file-item" style="border-left: 4px solid ${CAT_COLORS[doc.category] || '#999'}">\n      <div class="file-header">\n        <span class="file-cat-icon" style="color: ${CAT_COLORS[doc.category] || '#999'}">${CAT_ICONS[doc.category] || '📄'}</span>\n        <div class="file-info">\n          <div class="file-name">${doc.name}</div>\n          <div class="file-meta">\n            ${doc.category} · ${new Date(doc.addedAt).toLocaleDateString()}${doc.notes ? ` · ${doc.notes}` : ''}\n          </div>\n        </div>\n      </div>\n      <div class="file-actions">\n        ${doc.url ? `<button class="btn btn-sm btn-primary" onclick="viewGDriveDoc('${doc.url.replace(/'/g,"\\'" )})" title="View">👁 View</button>` : ''}\n        <button class="btn btn-sm" onclick="editGDriveDoc(${doc.id})" title="Edit">✏ Edit</button>\n        <button class="btn btn-danger btn-sm" onclick="deleteFile(${doc.id})" title="Delete">✕</button>\n      </div>\n    </div>\n  `).join('');
+  renderRequiredDocsList();
+}
+
+function renderRequiredDocsList() { const docs = loadVault(); const list = document.getElementById('vaultRequiredList'); if (!list) return; const linked = new Set(docs.map(d => REQUIRED_DOCS.find(r => r.id === d.id)?.id).filter(Boolean)); let reqHtml = `<div style="padding: 16px; border-bottom: 1px solid var(--border);">\n      <div style="font-size: 13px; color: var(--muted); margin-bottom: 12px; font-weight: 600;">📋 REQUIRED DOCUMENTS — ${linked.size}/${REQUIRED_DOCS.length}</div>\n      <div style="display: grid; gap: 8px;">`; reqHtml += REQUIRED_DOCS.map(req => { const hasDoc = linked.has(req.id); return `<div style="display: flex; align-items: center; gap: 8px; padding: 8px; background: ${hasDoc ? 'rgba(22, 102, 56, 0.1)' : 'rgba(181, 42, 28, 0.05)'}; border-radius: 6px; font-size: 12px;"> <span style="font-size: 16px;">${hasDoc ? '✓' : '✗'}</span> <span>${req.label}</span> ${!hasDoc ? `<button class="btn btn-sm btn-primary" onclick="openAddDocModal()" style="margin-left: auto;">+</button>` : ''} </div>`; }).join(''); reqHtml += `</div></div>`; list.innerHTML = reqHtml; }
+    <!-- DASHBOARD PAGE -->
+    <div class="page active" id="page-dashboard">
+      <div id="dashAlerts"></div>
+
+      <div class="stat-row">
+        <div class="stat-box">
+          <div class="stat-label">Alerts</div>
+          <div class="stat-value" id="statAlerts" style="color:var(--green)">0</div>
+          <div class="stat-sub">All clear</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Checklist 2025</div>
+          <div class="stat-value" id="statChecklist" style="color:var(--accent)">0%</div>
+          <div class="stat-sub" id="statChecklistSub">0/18 done</div>
+          <div class="progress-bar"><div class="progress-fill" id="checklistBar" style="width:0%;background:var(--accent)"></div></div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Distributions 2025</div>
+          <div class="stat-value" id="statDist" style="color:var(--green)">$0</div>
+          <div class="stat-sub" id="statDistSub">0 this year</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Tax Reserve (30%)</div>
+          <div class="stat-value" id="statTax" style="color:var(--blue)">$0</div>
+          <div class="stat-sub">Set aside</div>
+        </div>
+      </div>
+
+      <!-- COMPLIANCE SUMMARY -->
+      <div class="section-head">Compliance Status</div>
+      <div class="card">
+        <div id="complianceSummary"></div>
+      </div>
+
+      <!-- QUICK LINKS -->
+      <div class="section-head">Quick Links</div>
+      <div class="links-grid">
+        <a class="link-tile" href="https://www.irs.gov/payments" target="_blank">
+          <div class="link-icon">🇺🇸</div>
+          <div class="link-label">IRS Direct Pay</div>
+          <div class="link-url">irs.gov/payments</div>
+        </a>
+        <a class="link-tile" href="https://www.ftb.ca.gov" target="_blank">
+          <div class="link-icon">🌉</div>
+          <div class="link-label">CA FTB Web Pay</div>
+          <div class="link-url">ftb.ca.gov</div>
+        </a>
+        <a class="link-tile" href="https://bizfileonline.sos.ca.gov" target="_blank">
+          <div class="link-icon">🏛</div>
+          <div class="link-label">CA BizFile SOS</div>
+          <div class="link-url">bizfileonline.sos.ca.gov</div>
+        </a>
+        <a class="link-tile" href="https://www.cslb.ca.gov/OnlineServices/CheckLicenseII/CheckLicense.aspx" target="_blank">
+          <div class="link-icon">🔨</div>
+          <div class="link-label">CSLB License</div>
+          <div class="link-url">cslb.ca.gov</div>
+        </a>
+        <a class="link-tile" href="https://app.gusto.com" target="_blank">
+          <div class="link-icon">💼</div>
+          <div class="link-label">Gusto Payroll</div>
+          <div class="link-url">app.gusto.com</div>
+        </a>
+        <a class="link-tile" href="https://www.irs.gov/pub/irs-pdf/fw9.pdf" target="_blank">
+          <div class="link-icon">📄</div>
+          <div class="link-label">IRS Form W-9</div>
+          <div class="link-url">irs.gov</div>
+        </a>
+      </div>
+
+      <div style="height:8px"></div>
+    </div>
+
+    <!-- COMPLIANCE PAGE -->
+    <div class="page" id="page-compliance">
+      <div class="page-hero">
+        <div class="page-tag">Monitoring</div>
+        <div class="page-title">Compliance</div>
+      </div>
+      <div id="complianceAlerts"></div>
+      <div class="section-head">All Items</div>
+      <div class="card" id="complianceList"></div>
+      <div class="section-head">Renewal Timeline</div>
+      <div class="card" id="timelineList"></div>
+      <div style="height:8px"></div>
+    </div>
+
+    <!-- INSURANCE PAGE -->
+    <div class="page" id="page-insurance">
+      <div class="page-hero">
+        <div class="page-tag">Protection</div>
+        <div class="page-title">Insurance & Bond</div>
+      </div>
+      <div id="insuranceCards"></div>
+      <div style="height:8px"></div>
+    </div>
+
+    <!-- DISTRIBUTIONS PAGE -->
+    <div class="page" id="page-distributions">
+      <div class="page-hero">
+        <div class="page-tag">Financials</div>
+        <div class="page-title">Distributions</div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-box">
+          <div class="stat-label">Total 2025</div>
+          <div class="stat-value" id="distTotal2025" style="color:var(--green)">$0</div>
+          <div class="stat-sub" id="distCount2025">0 payments</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Tax Reserve</div>
+          <div class="stat-value" id="distTaxReserve" style="color:var(--accent)">$0</div>
+          <div class="stat-sub">30% of total</div>
+        </div>
+      </div>
+
+      <div class="px" style="margin-bottom:14px">
+        <button class="btn btn-primary btn-full" onclick="openModal('addDistModal')">+ Add Distribution</button>
+      </div>
+
+      <div class="section-head">Distribution Log</div>
+      <div class="card" id="distList">
+        <div style="padding:20px;color:var(--muted2);font-size:13px;font-family:var(--mono)">No distributions yet</div>
+      </div>
+
+      <div class="section-head">Estimated Tax Deadlines</div>
+      <div class="card">
+        <div class="row"><div><div class="row-label">Q1 — April 15</div><div class="row-sub">Federal + CA</div></div><div class="row-right"><a href="https://www.irs.gov/payments" target="_blank" class="btn btn-ghost btn-sm">Pay →</a></div></div>
+        <div class="row"><div><div class="row-label">Q2 — June 15</div><div class="row-sub">Federal + CA</div></div><div class="row-right"><a href="https://www.irs.gov/payments" target="_blank" class="btn btn-ghost btn-sm">Pay →</a></div></div>
+        <div class="row"><div><div class="row-label">Q3 — September 15</div><div class="row-sub">Federal + CA</div></div><div class="row-right"><a href="https://www.irs.gov/payments" target="_blank" class="btn btn-ghost btn-sm">Pay →</a></div></div>
+        <div class="row"><div><div class="row-label">Q4 — January 15</div><div class="row-sub">Federal + CA</div></div><div class="row-right"><a href="https://www.irs.gov/payments" target="_blank" class="btn btn-ghost btn-sm">Pay →</a></div></div>
+      </div>
+      <div style="height:8px"></div>
+    </div>
+
+    <!-- CHECKLIST PAGE -->
+    <div class="page" id="page-checklist">
+      <div class="page-hero">
+        <div class="page-tag">Annual Tasks</div>
+        <div class="page-title">Checklist 2025</div>
+      </div>
+
+      <div style="padding:0 16px 16px">
+        <div style="font-size:40px;font-weight:800;color:var(--accent)" id="checkPct">0%</div>
+        <div style="font-size:12px;color:var(--muted2);font-family:var(--mono)" id="checkCount">0 of 18 completed</div>
+        <div class="progress-bar" style="margin-top:10px;height:6px"><div class="progress-fill" id="checkBar" style="width:0%;background:var(--accent)"></div></div>
+      </div>
+
+      <div id="checklistContent"></div>
+      <div style="height:8px"></div>
+    </div>
+
+
+    <!-- DOCUMENTS PAGE -->
+    <div class="page" id="page-documents">
+      <div class="page-hero">
+        <div class="page-tag">Auto-Generated</div>
+        <div class="page-title">Documents</div>
+      </div>
+
+      <!-- OVERDUE BANNER -->
+      <div id="docsOverdueBanner"></div>
+
+      <!-- UPCOMING DEADLINES -->
+      <div class="section-head">Upcoming Deadlines</div>
+      <div class="card" id="docsDeadlines"></div>
+
+      <!-- DOCUMENT GENERATOR -->
+      <div class="section-head">Generate Document</div>
+      <div style="padding:0 16px 14px;display:grid;grid-template-columns:1fr 1fr;gap:10px" id="docButtons"></div>
+
+      <!-- GENERATED DOCUMENT PREVIEW -->
+      <div id="docPreviewArea" style="display:none">
+        <div class="section-head">Generated Document</div>
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-title" id="docPreviewTitle">Document</div>
+              <div class="card-sub" id="docPreviewDue"></div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="printDoc()">🖨 Print / PDF</button>
+          </div>
+          <div id="docPreviewContent" style="padding:16px;font-family:var(--mono);font-size:12px;line-height:1.8;white-space:pre-wrap;color:var(--text);background:#fff;border-radius:0 0 10px 10px"></div>
+        </div>
+      </div>
+
+      <div style="height:8px"></div>
+    </div>
+
+
+    <!-- VAULT PAGE -->
+    <div class="page" id="page-vault">
+      <div class="page-hero">
+        <div class="page-tag">Company Files</div>
+        <div class="page-title">Document Vault</div>
+      </div>
+
+      <!-- UPLOAD AREA -->
+      <div style="padding:0 16px 14px">
+        <label id="uploadLabel" style="
+          display:flex;flex-direction:column;align-items:center;justify-content:center;
+          gap:10px;padding:24px 16px;
+          background:#fff;border:2px dashed var(--border2);border-radius:12px;
+          cursor:pointer;transition:border-color .2s;
+        ">
+          <input type="file" id="fileInput" multiple accept="*/*" style="display:none" onchange="handleFileUpload(event)">
+          <span style="font-size:36px">📎</span>
+          <span style="font-size:14px;font-weight:700;color:var(--text)">Tap to upload files</span>
+          <span style="font-size:11px;color:var(--muted2);font-family:var(--mono);text-align:center">PDF, photos, Word docs, any file<br>Stored on this device only</span>
+        </label>
+      </div>
+
+      <!-- SEARCH -->
+      <div style="padding:0 16px 14px">
+        <input type="text" id="vaultSearch" placeholder="Search files..." oninput="renderVault()" style="background:#fff">
+      </div>
+
+      <!-- CATEGORY FILTER -->
+      <div style="padding:0 16px 10px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none" id="vaultFilters"></div>
+
+      <!-- STORAGE USAGE -->
+      <div style="padding:0 16px 10px;display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:11px;font-family:var(--mono);color:var(--muted2)" id="storageInfo">0 files · 0 MB used</span>
+        <span style="font-size:10px;font-family:var(--mono);color:var(--muted2)">Max ~50MB total</span>
+      </div>
+
+      <!-- FILE LIST -->
+      <div id="vaultFileList"></div>
+
+      <!-- REQUIRED DOCS CHECKLIST -->
+      <div class="section-head">Required Company Documents</div>
+      <div class="card" id="vaultRequiredList"></div>
+
+      <div style="height:8px"></div>
+    </div>
+
+    <!-- GOOGLE DRIVE DOCUMENT MODAL -->
+    <div id="gdriveAddModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:10000;align-items:center;justify-content:center;padding:16px">
+      <div style="background:var(--surface);border-radius:12px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto">
+        <div style="font-size:18px;font-weight:700;margin-bottom:20px">📎 Add Document Link</div>
+        <div style="margin-bottom:16px">
+          <label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px;color:var(--text)">Document Name *</label>
+          <input type="text" id="gdriveName" placeholder="e.g., General Liability Insurance 2026" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:6px;font-size:14px;box-sizing:border-box">
+        </div>
+        <div style="margin-bottom:16px">
+          <label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px;color:var(--text)">Category</label>
+          <select id="gdriveCategory" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:6px;font-size:14px;box-sizing:border-box">
+            <option value="Formation">🏛 Formation</option>
+            <option value="Corporate">📋 Corporate</option>
+            <option value="Licenses">🔨 Licenses</option>
+            <option value="Insurance">🛡 Insurance</option>
+            <option value="Tax">📊 Tax</option>
+            <option value="Payroll">💰 Payroll</option>
+            <option value="Contracts">📜 Contracts</option>
+            <option value="Other">📁 Other</option>
+          </select>
+        </div>
+        <div style="margin-bottom:16px">
+          <label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px;color:var(--text)">Google Drive Link *</label>
+          <input type="url" id="gdriveUrl" placeholder="Paste share link from Google Drive" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:6px;font-size:14px;box-sizing:border-box;font-family:var(--mono);font-size:12px">
+        </div>
+        <div style="margin-bottom:20px">
+          <label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px;color:var(--text)">Notes (optional)</label>
+          <textarea id="gdriveNotes" placeholder="e.g., Expires 12/2026, Mark Florea agent" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:6px;font-size:12px;box-sizing:border-box;resize:vertical;min-height:60px;font-family:var(--mono)" ></textarea>
+        </div>
+        <input type="hidden" id="gdriveCurrentId" value="">
+        <div style="display:flex;gap:8px">
+          <button onclick="saveGDriveDoc()" class="btn btn-primary" style="flex:1">Save</button>
+          <button onclick="closeAddDocModal()" class="btn" style="flex:1">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VENDORS PAGE -->
+    <div class="page" id="page-vendors">
+      <div class="page-hero">
+        <div class="page-tag">Suppliers</div>
+        <div class="page-title">Vendor Accounts</div>
+      </div>
+
+      <div style="padding:0 16px 14px;display:flex;gap:8px">
+        <input type="text" id="vendorSearch" placeholder="Search vendors..." oninput="renderVendors()" style="background:#fff;flex:1">
+        <button class="btn btn-primary" onclick="openModal('addVendorModal')">+ Add</button>
+      </div>
+
+      <div id="vendorStats" style="padding:0 16px 14px;display:flex;gap:10px;overflow-x:auto;scrollbar-width:none"></div>
+
+      <div id="vendorList"></div>
+      <div style="height:8px"></div>
+    </div>
+
+    <!-- SETTINGS PAGE -->
+    <div class="page" id="page-settings">
+      <div class="page-hero">
+        <div class="page-tag">Configuration</div>
+        <div class="page-title">Settings</div>
+      </div>
+
+      <div class="section-head">Company</div>
+      <div class="card"><div class="card-body">
+        <div class="field"><label class="field-label">EIN</label><input type="text" id="s_ein" placeholder="99-1788037" oninput="saveSetting('ein',this.value)"></div>
+        <div class="field"><label class="field-label">CSLB License #</label><input type="text" id="s_cslb" placeholder="1123785" oninput="saveSetting('cslb',this.value)"></div>
+        <div class="field"><label class="field-label">EPA 608 Certificate #</label><input type="text" id="s_epa608" placeholder="OiNXMYM1DG" oninput="saveSetting('epa608',this.value)"></div>
+        <div class="field"><label class="field-label">Address</label><input type="text" id="s_address" placeholder="2800 Walnut Ave, Apt 43, Carmichael CA 95608" oninput="saveSetting('address',this.value)"></div>
+        <div class="field"><label class="field-label">Phone</label><input type="tel" id="s_phone" placeholder="(916) 225-0793" oninput="saveSetting('phone',this.value)"></div>
+        <div class="field"><label class="field-label">Email</label><input type="email" id="s_email" placeholder="alexandr.zakirov@gmail.com" oninput="saveSetting('email',this.value)"></div>
+      </div></div>
+
+      <div class="section-head">Payroll</div>
+      <div class="card"><div class="card-body">
+        <div class="field"><label class="field-label">Annual W-2 Salary ($)</label><input type="number" id="s_salary" placeholder="50000" oninput="saveSetting('salary',this.value)"></div>
+        <div class="field"><label class="field-label">Pay Frequency</label>
+          <select id="s_payFreq" onchange="saveSetting('payFreq',this.value)">
+            <option>Weekly</option><option selected>Bi-weekly</option><option>Semi-monthly</option><option>Monthly</option>
+          </select>
+        </div>
+      </div></div>
+
+      <div class="section-head">Secretary of State</div>
+      <div class="card"><div class="card-body">
+        <div class="field"><label class="field-label">Entity Number</label><input type="text" id="s_entityNum" placeholder="6117165" oninput="saveSetting('entityNum',this.value)"></div>
+        <div class="field"><label class="field-label">Incorporation Month</label>
+          <select id="s_incMonth" onchange="saveSetting('incMonth',this.value)">
+            <option value="">Select...</option>
+            <option>January</option><option>February</option><option>March</option><option>April</option>
+            <option>May</option><option>June</option><option>July</option><option>August</option>
+            <option>September</option><option>October</option><option>November</option><option>December</option>
+          </select>
+        </div>
+        <div class="field"><label class="field-label">SI-200 Due Date</label><input type="date" id="s_siDue" onchange="saveSetting('siDue',this.value)"></div>
+        <a href="https://bizfileonline.sos.ca.gov" target="_blank" class="btn btn-ghost btn-full" style="text-decoration:none;margin-top:4px">🏛 File SI-200 Online</a>
+      </div></div>
+
+      <div class="section-head">Insurance Agent</div>
+      <div class="card"><div class="card-body" style="font-family:var(--mono);font-size:12px;line-height:2">
+        <div><strong>Mark Florea</strong> — Pro-Builders Insurance Agency</div>
+        <div>📞 <a href="tel:9169640717" style="color:var(--blue)">(916) 964-0717</a></div>
+        <div>📧 <a href="mailto:mark@insureprobuilders.com" style="color:var(--blue)">mark@insureprobuilders.com</a></div>
+        <div>📍 2865 Sunrise Blvd Ste 110, Rancho Cordova, CA 95742</div>
+        <div style="margin-top:8px;padding:8px;background:var(--surface2);border-radius:6px;font-size:11px">
+          Workers Comp: CWC03618700 · Expires 10/03/2026<br>
+          Insurer: Clear Spring Property & Casualty (NAIC 15563)
+        </div>
+      </div></div>
+
+      <div class="section-head">Data</div>
+      <div class="card"><div class="card-body">
+        <div style="font-size:12px;color:var(--muted2);font-family:var(--mono);margin-bottom:14px;line-height:1.7">Data stored locally on this device. Export to back up.</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-ghost" onclick="exportData()">⬇ Export JSON</button>
+          <button class="btn btn-danger" onclick="resetData()">🗑 Reset All</button>
+        </div>
+      </div></div>
+
+      <div style="height:8px"></div>
+    </div>
+
+  </div><!-- /scroll-area -->
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" id="nav-dashboard" onclick="goPage('dashboard')">
+      <span class="nav-icon">⬡</span>
+      <span>Home</span>
+    </button>
+    <button class="nav-btn" id="nav-compliance" onclick="goPage('compliance')">
+      <span class="nav-icon">🛡</span>
+      <span>Comply</span>
+      <span class="nav-dot" id="complianceDot" style="display:none"></span>
+    </button>
+    <button class="nav-btn" id="nav-insurance" onclick="goPage('insurance')">
+      <span class="nav-icon">📋</span>
+      <span>Insurance</span>
+    </button>
+    <button class="nav-btn" id="nav-distributions" onclick="goPage('distributions')">
+      <span class="nav-icon">💵</span>
+      <span>Money</span>
+    </button>
+    <button class="nav-btn" id="nav-checklist" onclick="goPage('checklist')">
+      <span class="nav-icon">✓</span>
+      <span>Tasks</span>
+    </button>
+    <button class="nav-btn" id="nav-documents" onclick="goPage('documents')">
+      <span class="nav-icon">📝</span>
+      <span>Docs</span>
+    </button>
+    <button class="nav-btn" id="nav-vendors" onclick="goPage('vendors')">
+      <span class="nav-icon">🏪</span>
+      <span>Vendors</span>
+    </button>
+    <button class="nav-btn" id="nav-vault" onclick="goPage('vault')">
+      <span class="nav-icon">🗄</span>
+      <span>Vault</span>
+    </button>
+    <button class="nav-btn" id="nav-settings" onclick="goPage('settings')">
+      <span class="nav-icon">⚙</span>
+      <span>Settings</span>
+    </button>
+  </nav>
+</div>
+
+<!-- MODALS -->
+
+<!-- Add Distribution Modal -->
+<div class="modal-overlay" id="addDistModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <div class="modal-title">Add Distribution</div>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label class="field-label">Quarter</label>
+        <select id="m_quarter"><option>Q1</option><option>Q2</option><option>Q3</option><option>Q4</option></select>
+      </div>
+      <div class="field"><label class="field-label">Year</label>
+        <select id="m_year"><option>2024</option><option selected>2025</option><option>2026</option></select>
+      </div>
+      <div class="field"><label class="field-label">Amount ($)</label>
+        <input type="number" id="m_amount" placeholder="12500">
+      </div>
+      <div class="field"><label class="field-label">Payment Date</label>
+        <input type="date" id="m_date">
+      </div>
+      <div class="field"><label class="field-label">Notes (optional)</label>
+        <input type="text" id="m_notes" placeholder="e.g. Q1 shareholder distribution">
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:14px">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+          <input type="checkbox" id="m_resolution" style="width:auto;accent-color:var(--accent)"> Resolution signed
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+          <input type="checkbox" id="m_taxes" style="width:auto;accent-color:var(--accent)"> Taxes set aside
+        </label>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="saveDistribution()" style="margin-bottom:10px">Save Distribution</button>
+      <button class="btn btn-ghost btn-full" onclick="closeModal('addDistModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Insurance Modal -->
+<div class="modal-overlay" id="editInsModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <div class="modal-title" id="editInsTitle">Edit Insurance</div>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="m_insId">
+      <div class="field"><label class="field-label">Provider</label><input type="text" id="m_insProvider" placeholder="State Farm"></div>
+      <div class="field"><label class="field-label">Policy Number</label><input type="text" id="m_insPolicy" placeholder="POL-12345678"></div>
+      <div class="field"><label class="field-label">Coverage Amount</label><input type="text" id="m_insCoverage" placeholder="$1,000,000"></div>
+      <div class="field"><label class="field-label">Expiration Date</label><input type="date" id="m_insExpiry"></div>
+      <div class="field"><label class="field-label">Agent Name</label><input type="text" id="m_insAgent" placeholder="John Smith"></div>
+      <div class="field"><label class="field-label">Agent Phone</label><input type="tel" id="m_insPhone" placeholder="(916) 225-0793"></div>
+      <button class="btn btn-primary btn-full" onclick="saveInsurance()" style="margin-bottom:10px">Save</button>
+      <button class="btn btn-ghost btn-full" onclick="closeModal('editInsModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Add Vendor Modal -->
+<div class="modal-overlay" id="addVendorModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head"><div class="modal-title">Add Vendor</div></div>
+    <div class="modal-body">
+      <div class="field"><label class="field-label">Company Name *</label><input type="text" id="nv_name" placeholder="e.g. Home Depot Pro"></div>
+      <div class="field"><label class="field-label">Account Number</label><input type="text" id="nv_account" placeholder="123456"></div>
+      <div class="field"><label class="field-label">Category</label>
+        <select id="nv_category">
+          <option>HVAC Supply</option><option>HVAC Manufacturer</option><option>Refrigeration</option>
+          <option>Plumbing/HVAC</option><option>Parts</option><option>Tools</option><option>Other</option>
+        </select>
+      </div>
+      <div class="field"><label class="field-label">Login Email</label><input type="email" id="nv_email" placeholder="startconstructioncorp@gmail.com"></div>
+      <div class="field"><label class="field-label">Password</label><input type="text" id="nv_password" placeholder="stored securely on device"></div>
+      <div class="field"><label class="field-label">Portal URL</label><input type="url" id="nv_url" placeholder="https://..."></div>
+      <div class="field"><label class="field-label">Status</label>
+        <select id="nv_status"><option value="active">Active</option><option value="pending">Pending</option><option value="needed">Need Account</option></select>
+      </div>
+      <div class="field"><label class="field-label">Notes</label><input type="text" id="nv_notes" placeholder="Any notes..."></div>
+      <button class="btn btn-primary btn-full" onclick="addNewVendor()" style="margin-bottom:10px">Add Vendor</button>
+      <button class="btn btn-ghost btn-full" onclick="closeModal('addVendorModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Vendor Modal -->
+<div class="modal-overlay" id="editVendorModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head"><div class="modal-title">Edit Vendor</div></div>
+    <div class="modal-body">
+      <input type="hidden" id="ev_id">
+      <div class="field"><label class="field-label">Company Name</label><input type="text" id="ev_name"></div>
+      <div class="field"><label class="field-label">Account Number</label><input type="text" id="ev_account"></div>
+      <div class="field"><label class="field-label">Category</label>
+        <select id="ev_category">
+          <option>HVAC Supply</option><option>HVAC Manufacturer</option><option>Refrigeration</option>
+          <option>Plumbing/HVAC</option><option>Parts</option><option>Tools</option><option>Other</option>
+        </select>
+      </div>
+      <div class="field"><label class="field-label">Login Email</label><input type="email" id="ev_email"></div>
+      <div class="field"><label class="field-label">Password</label><input type="text" id="ev_password"></div>
+      <div class="field"><label class="field-label">Portal URL</label><input type="url" id="ev_url"></div>
+      <div class="field"><label class="field-label">Status</label>
+        <select id="ev_status"><option value="active">Active</option><option value="pending">Pending</option><option value="needed">Need Account</option></select>
+      </div>
+      <div class="field"><label class="field-label">Notes</label><input type="text" id="ev_notes"></div>
+      <button class="btn btn-primary btn-full" onclick="saveVendorEdit()" style="margin-bottom:10px">Save Changes</button>
+      <button class="btn btn-ghost btn-full" onclick="closeModal('editVendorModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✓ Saved</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────
+const KEY = 'sc_pwa_v1';
+
+const DEFAULT = {
+  settings: { ein:'99-1788037', cslb:'1123785', address:'2800 Walnut Ave, Apt 43, Carmichael, CA 95608', phone:'(916) 225-0793', email:'alexandr.zakirov@gmail.com', salary:'', payFreq:'Bi-weekly', entityNum:'6117165', incMonth:'February', siDue:'2026-02-28', epa608:'OiNXMYM1DG' },
+  insurance: [
+    { id:1, type:'General Liability',   icon:'🛡', provider:'Pro-Builders Insurance Agency', policy:'', coverage:'', expiry:'', agent:'Mark Florea', agentPhone:'(916) 964-0717' },
+    { id:2, type:'Workers Compensation',icon:'👷', provider:'Clear Spring Property & Casualty', policy:'CWC03618700', coverage:'$1,000,000', expiry:'2026-10-03', agent:'Mark Florea / Pro-Builders', agentPhone:'(916) 964-0717' },
+    { id:3, type:'Commercial Auto',     icon:'🚗', provider:'', policy:'', coverage:'', expiry:'', agent:'', agentPhone:'' },
+    { id:4, type:"Contractor's Bond",   icon:'🔗', provider:'', policy:'', coverage:'$15,000', expiry:'', agent:'', agentPhone:'' },
+    { id:5, type:'Umbrella Policy',     icon:'☂',  provider:'', policy:'', coverage:'', expiry:'', agent:'', agentPhone:'' },
+  ],
+  distributions: [],
+  checklist: {}
+};
+
+const CHECKLIST = [
+  { id:'annual_minutes',  label:'Annual Meeting Minutes signed',         due:'Jan 31',   q:null },
+  { id:'w2_self',         label:'W-2 sent to self via Gusto',            due:'Jan 31',   q:null },
+  { id:'_1099_subs',      label:'1099-NEC sent to subcontractors',       due:'Jan 31',   q:null },
+  { id:'_1120s',          label:'Form 1120-S filed (Federal)',           due:'Mar 15',   q:null },
+  { id:'ca_100s',         label:'CA Form 100S filed',                    due:'Mar 15',   q:null },
+  { id:'si200',           label:'Statement of Information SI-200 filed', due:'See month',q:null },
+  { id:'insurance_renew', label:'All insurance policies renewed',        due:'Nov/Dec',  q:null },
+  { id:'q1_resolution',   label:'Q1 Distribution Resolution signed',     due:'Mar/Apr',  q:1 },
+  { id:'q1_fed',          label:'Federal Estimated Tax Q1 paid',         due:'Apr 15',   q:1 },
+  { id:'q1_ca',           label:'CA Estimated Tax Q1 paid',              due:'Apr 15',   q:1 },
+  { id:'q2_resolution',   label:'Q2 Distribution Resolution signed',     due:'Jun',      q:2 },
+  { id:'q2_fed',          label:'Federal Estimated Tax Q2 paid',         due:'Jun 15',   q:2 },
+  { id:'q2_ca',           label:'CA Estimated Tax Q2 paid',              due:'Jun 15',   q:2 },
+  { id:'q3_resolution',   label:'Q3 Distribution Resolution signed',     due:'Sep',      q:3 },
+  { id:'q3_fed',          label:'Federal Estimated Tax Q3 paid',         due:'Sep 15',   q:3 },
+  { id:'q3_ca',           label:'CA Estimated Tax Q3 paid',              due:'Sep 15',   q:3 },
+  { id:'q4_resolution',   label:'Q4 Distribution Resolution signed',     due:'Dec',      q:4 },
+  { id:'q4_fed',          label:'Federal Estimated Tax Q4 paid',         due:'Jan 15',   q:4 },
+];
+
+let D = (() => { try { const r = localStorage.getItem(KEY); return r ? { ...DEFAULT, ...JSON.parse(r), insurance: JSON.parse(r) ? (JSON.parse(r).insurance || DEFAULT.insurance) : DEFAULT.insurance } : DEFAULT; } catch { return DEFAULT; } })();
+
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(D)); } catch {}
+  showToast();
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────
+function daysUntil(d) {
+  if (!d) return null;
+  const exp = new Date(d); const today = new Date();
+  today.setHours(0,0,0,0); exp.setHours(0,0,0,0);
+  return Math.round((exp - today) / 86400000);
+}
+
+function statusFromDays(d) {
+  if (d === null) return 'empty';
+  if (d < 0) return 'expired';
+  if (d <= 30) return 'critical';
+  if (d <= 60) return 'warning';
+  return 'ok';
+}
+
+function badgeHtml(status, days) {
+  const map = { ok:'badge-ok|Current', warning:'badge-warning|Renew Soon', critical:'badge-critical|Urgent!', expired:'badge-expired|EXPIRED', empty:'badge-empty|Not Set' };
+  const [cls, label] = (map[status] || map.empty).split('|');
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  const dt = new Date(d + 'T00:00:00');
+  return dt.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+}
+
+function fmtMoney(v) { return '$' + Number(v||0).toLocaleString(); }
+
+function getAlerts() {
+  const alerts = [];
+  D.insurance.forEach(ins => {
+    const days = daysUntil(ins.expiry);
+    const st = statusFromDays(days);
+    if ((st === 'critical' || st === 'expired') && ins.expiry)
+      alerts.push({ label: ins.type, days, status: st });
+  });
+  const sosDays = daysUntil(D.settings.siDue);
+  const sosSt = statusFromDays(sosDays);
+  if ((sosSt === 'critical' || sosSt === 'expired') && D.settings.siDue)
+    alerts.push({ label: 'Statement of Information SI-200', days: sosDays, status: sosSt });
+  return alerts;
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────
+let currentPage = 'dashboard';
+
+function goPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.getElementById('nav-' + page).classList.add('active');
+  document.getElementById('scrollArea').scrollTop = 0;
+  currentPage = page;
+  render();
+}
+
+// ── MODALS ────────────────────────────────────────────────────────
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Close modal on backdrop click
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
+});
+
+// ── TOAST ─────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg || '✓ Saved';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// ── RENDER ────────────────────────────────────────────────────────
+function render() {
+  const alerts = getAlerts();
+  renderHeader(alerts);
+  if (currentPage === 'dashboard') renderDashboard(alerts);
+  if (currentPage === 'compliance') renderCompliance(alerts);
+  if (currentPage === 'insurance') renderInsurance();
+  if (currentPage === 'distributions') renderDistributions();
+  if (currentPage === 'checklist') renderChecklist();
+  if (currentPage === 'settings') renderSettings();
+  if (currentPage === 'documents') renderDocuments();
+  if (currentPage === 'vault') renderVault();
+  if (currentPage === 'vendors') renderVendors();
+}
+
+function renderHeader(alerts) {
+    const pill = document.getElementById('alertPill');
+    const dot = document.getElementById('complianceDot');
+    if (alerts.length > 0) {
+      if (pill) {
+        pill.style.display = 'block';
+        pill.textContent = alerts.length + ' alert' + (alerts.length > 1 ? 's' : '');
+      }
+      if (dot) dot.style.display = 'block';
+    } else {
+      if (pill) pill.style.display = 'none';
+      if (dot) dot.style.display = 'none';
+    }
+}
+
+function renderDashboard(alerts) {
+  // Alert banners
+  const dashAlerts = document.getElementById('dashAlerts');
+  if (alerts.length === 0) {
+    dashAlerts.innerHTML = `<div class="alert-banner ok" style="margin-top:14px"><div class="alert-icon">✅</div><div><div class="alert-text" style="color:var(--green)">All compliance items current</div><div class="alert-sub">No expirations within 60 days</div></div></div>`;
+  } else {
+    dashAlerts.innerHTML = '<div style="height:14px"></div>' + alerts.map(a => `
+      <div class="alert-banner ${a.status === 'expired' ? 'critical' : a.status}">
+        <div class="alert-icon">${a.status === 'expired' ? '🚨' : '⚠️'}</div>
+        <div>
+          <div class="alert-text">${a.status === 'expired' ? a.label + ' — EXPIRED' : a.label}</div>
+          <div class="alert-sub">${a.status === 'expired' ? 'Take action immediately' : `Expires in ${a.days} days`}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  // Stats
+  const done = CHECKLIST.filter(i => D.checklist[i.id + '_2025']).length;
+  const pct = Math.round((done / CHECKLIST.length) * 100);
+  document.getElementById('statAlerts').textContent = alerts.length;
+  document.getElementById('statAlerts').style.color = alerts.length > 0 ? 'var(--red)' : 'var(--green)';
+  document.getElementById('statChecklist').textContent = pct + '%';
+  document.getElementById('statChecklistSub').textContent = `${done}/${CHECKLIST.length} done`;
+  document.getElementById('checklistBar').style.width = pct + '%';
+
+  const dists2025 = D.distributions.filter(d => d.year === '2025');
+  const total2025 = dists2025.reduce((s, d) => s + Number(d.amount || 0), 0);
+  document.getElementById('statDist').textContent = fmtMoney(total2025);
+  document.getElementById('statDistSub').textContent = dists2025.length + ' this year';
+  document.getElementById('statTax').textContent = fmtMoney(Math.round(total2025 * 0.3));
+
+  // Compliance summary
+  const allItems = [
+    { icon:'🏛', name:'Statement of Info (SI-200)', expiry: D.settings.siDue },
+    ...D.insurance.map(i => ({ icon: i.icon, name: i.type, expiry: i.expiry }))
+  ];
+  document.getElementById('complianceSummary').innerHTML = allItems.map(item => {
+    const days = daysUntil(item.expiry);
+    const st = statusFromDays(days);
+    return `<div class="row">
+      <div><div class="row-label">${item.icon} ${item.name}</div>
+      ${item.expiry ? `<div class="row-sub">${fmtDate(item.expiry)}</div>` : ''}</div>
+      <div class="row-right">${badgeHtml(st, days)}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderCompliance(alerts) {
+  const allItems = [
+    { icon:'🏛', name:'Statement of Information (SI-200)', provider:'CA Secretary of State', expiry: D.settings.siDue },
+    ...D.insurance.map(i => ({ icon: i.icon, name: i.type, provider: i.provider || '—', expiry: i.expiry, policy: i.policy }))
+  ];
+
+  // Alert banners
+  const ca = document.getElementById('complianceAlerts');
+  if (alerts.length === 0) {
+    ca.innerHTML = `<div class="alert-banner ok" style="margin-top:14px"><div class="alert-icon">✅</div><div><div class="alert-text" style="color:var(--green)">All items current</div><div class="alert-sub">No expirations within 60 days</div></div></div>`;
+  } else {
+    ca.innerHTML = '<div style="height:14px"></div>' + alerts.map(a => `
+      <div class="alert-banner ${a.status === 'expired' ? 'critical' : a.status}">
+        <div class="alert-icon">${a.status === 'expired' ? '🚨' : '⚠️'}</div>
+        <div><div class="alert-text">${a.label}</div>
+        <div class="alert-sub">${a.status === 'expired' ? `EXPIRED ${Math.abs(a.days)} days ago` : `${a.days} days remaining`}</div></div>
+      </div>`).join('');
+  }
+
+  // List
+  document.getElementById('complianceList').innerHTML = allItems.map(item => {
+    const days = daysUntil(item.expiry);
+    const st = statusFromDays(days);
+    const daysColor = st === 'ok' ? 'var(--green)' : st === 'warning' ? 'var(--yellow)' : st === 'empty' ? 'var(--muted2)' : 'var(--red)';
+    return `<div class="row">
+      <div>
+        <div class="row-label">${item.icon} ${item.name}</div>
+        <div class="row-sub">${item.provider}${item.policy ? ' · ' + item.policy : ''}</div>
+        <div class="row-sub">${fmtDate(item.expiry)}</div>
+      </div>
+      <div class="row-right" style="flex-direction:column;align-items:flex-end;gap:4px">
+        ${badgeHtml(st, days)}
+        <span style="font-family:var(--mono);font-size:12px;font-weight:600;color:${daysColor}">
+          ${days === null ? '—' : days < 0 ? Math.abs(days) + 'd ago' : days + 'd'}
+        </span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Timeline
+  const sorted = allItems.filter(i => i.expiry).sort((a,b) => new Date(a.expiry) - new Date(b.expiry));
+  document.getElementById('timelineList').innerHTML = sorted.length === 0
+    ? '<div style="padding:20px;color:var(--muted2);font-size:13px;font-family:var(--mono)">Set expiry dates to see timeline</div>'
+    : sorted.map(item => {
+      const days = daysUntil(item.expiry);
+      const st = statusFromDays(days);
+      const color = st === 'ok' ? 'var(--green)' : st === 'warning' ? 'var(--yellow)' : 'var(--red)';
+      const pct = Math.max(0, Math.min(100, (days / 365) * 100));
+      return `<div class="row">
+        <div style="flex:1">
+          <div class="row-label">${item.icon} ${item.name}</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+            <div style="flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden">
+              <div style="width:${pct}%;height:100%;background:${color};border-radius:2px"></div>
+            </div>
+            <span style="font-size:10px;font-family:var(--mono);color:var(--muted2);white-space:nowrap">${fmtDate(item.expiry)}</span>
+          </div>
+        </div>
+        <div style="margin-left:10px">${badgeHtml(st, days)}</div>
+      </div>`;
+    }).join('');
+}
+
+function renderInsurance() {
+  document.getElementById('insuranceCards').innerHTML = D.insurance.map(ins => {
+    const days = daysUntil(ins.expiry);
+    const st = statusFromDays(days);
+    const borderColor = st === 'critical' || st === 'expired' ? 'var(--red)' : st === 'warning' ? 'var(--yellow)' : 'var(--border)';
+    return `<div class="card" style="border-color:${borderColor}">
+      <div class="card-head">
+        <div>
+          <div class="card-title">${ins.icon} ${ins.type}</div>
+          <div class="card-sub">${ins.provider || 'Provider not set'}</div>
+        </div>
+        ${badgeHtml(st, days)}
+      </div>
+      <div style="padding:14px 16px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+          ${[['Policy #', ins.policy || '—'], ['Coverage', ins.coverage || '—'], ['Expires', fmtDate(ins.expiry)], ['Agent', ins.agent || '—'], ['Agent Phone', ins.agentPhone || '—']].map(([l, v]) => `
+            <div>
+              <div style="font-size:9px;font-family:var(--mono);color:var(--muted2);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">${l}</div>
+              <div style="font-size:13px;font-family:var(--mono)">${v}</div>
+            </div>`).join('')}
+        </div>
+        <button class="btn btn-ghost btn-full" onclick="editInsurance(${ins.id})">✏ Edit</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function editInsurance(id) {
+  const ins = D.insurance.find(i => i.id === id);
+  if (!ins) return;
+  document.getElementById('editInsTitle').textContent = `Edit — ${ins.type}`;
+  document.getElementById('m_insId').value = id;
+  document.getElementById('m_insProvider').value = ins.provider || '';
+  document.getElementById('m_insPolicy').value = ins.policy || '';
+  document.getElementById('m_insCoverage').value = ins.coverage || '';
+  document.getElementById('m_insExpiry').value = ins.expiry || '';
+  document.getElementById('m_insAgent').value = ins.agent || '';
+  document.getElementById('m_insPhone').value = ins.agentPhone || '';
+  openModal('editInsModal');
+}
+
+function saveInsurance() {
+  const id = Number(document.getElementById('m_insId').value);
+  D.insurance = D.insurance.map(ins => ins.id === id ? {
+    ...ins,
+    provider: document.getElementById('m_insProvider').value,
+    policy: document.getElementById('m_insPolicy').value,
+    coverage: document.getElementById('m_insCoverage').value,
+    expiry: document.getElementById('m_insExpiry').value,
+    agent: document.getElementById('m_insAgent').value,
+    agentPhone: document.getElementById('m_insPhone').value,
+  } : ins);
+  save();
+  closeModal('editInsModal');
+  renderInsurance();
+  render();
+}
+
+function renderDistributions() {
+  const dists2025 = D.distributions.filter(d => d.year === '2025');
+  const total2025 = dists2025.reduce((s, d) => s + Number(d.amount || 0), 0);
+  document.getElementById('distTotal2025').textContent = fmtMoney(total2025);
+  document.getElementById('distCount2025').textContent = dists2025.length + ' payments';
+  document.getElementById('distTaxReserve').textContent = fmtMoney(Math.round(total2025 * 0.3));
+
+  const list = document.getElementById('distList');
+  if (D.distributions.length === 0) {
+    list.innerHTML = '<div style="padding:20px;color:var(--muted2);font-size:13px;font-family:var(--mono)">No distributions yet. Add your first one above.</div>';
+    return;
+  }
+  list.innerHTML = [...D.distributions].reverse().map((d, i) => `
+    <div class="dist-row">
+      <div>
+        <div class="dist-qtr">${d.quarter} ${d.year}</div>
+        <div class="dist-date">${fmtDate(d.date)}</div>
+        ${d.resolutionSigned ? '<span class="badge badge-ok" style="margin-top:4px">✓ Resolution</span>' : ''}
+      </div>
+      <div style="text-align:right">
+        <div class="dist-amount">${fmtMoney(d.amount)}</div>
+        <button class="btn btn-danger btn-sm" style="margin-top:6px;font-size:10px;padding:4px 10px" onclick="removeDistribution(${d.id})">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function saveDistribution() {
+  const amount = document.getElementById('m_amount').value;
+  const date = document.getElementById('m_date').value;
+  if (!amount || !date) { showToast('⚠ Fill amount & date'); return; }
+  D.distributions.push({
+    id: Date.now(),
+    quarter: document.getElementById('m_quarter').value,
+    year: document.getElementById('m_year').value,
+    amount,
+    date,
+    notes: document.getElementById('m_notes').value,
+    resolutionSigned: document.getElementById('m_resolution').checked,
+    taxesSet: document.getElementById('m_taxes').checked,
+  });
+  save();
+  closeModal('addDistModal');
+  document.getElementById('m_amount').value = '';
+  document.getElementById('m_date').value = '';
+  document.getElementById('m_notes').value = '';
+  document.getElementById('m_resolution').checked = false;
+  document.getElementById('m_taxes').checked = false;
+  renderDistributions();
+}
+
+function removeDistribution(id) {
+  if (!confirm('Remove this distribution?')) return;
+  D.distributions = D.distributions.filter(d => d.id !== id);
+  save();
+  renderDistributions();
+}
+
+function renderChecklist() {
+  const YEAR = '2025';
+  const done = CHECKLIST.filter(i => D.checklist[i.id + '_' + YEAR]).length;
+  const pct = Math.round((done / CHECKLIST.length) * 100);
+  document.getElementById('checkPct').textContent = pct + '%';
+  document.getElementById('checkCount').textContent = `${done} of ${CHECKLIST.length} completed`;
+  document.getElementById('checkBar').style.width = pct + '%';
+  document.getElementById('checkBar').style.background = pct === 100 ? 'var(--green)' : 'var(--accent)';
+
+  const groups = [
+    { title:'Annual Tasks', items: CHECKLIST.filter(i => i.q === null) },
+    { title:'Q1 Tasks', items: CHECKLIST.filter(i => i.q === 1) },
+    { title:'Q2 Tasks', items: CHECKLIST.filter(i => i.q === 2) },
+    { title:'Q3 Tasks', items: CHECKLIST.filter(i => i.q === 3) },
+    { title:'Q4 Tasks', items: CHECKLIST.filter(i => i.q === 4) },
+  ];
+
+  document.getElementById('checklistContent').innerHTML = groups.map(g => {
+    const gdone = g.items.filter(i => D.checklist[i.id + '_' + YEAR]).length;
+    return `
+      <div class="section-head">${g.title} (${gdone}/${g.items.length})</div>
+      <div class="card">
+        ${g.items.map(item => {
+          const checked = !!D.checklist[item.id + '_' + YEAR];
+          return `<div class="check-row ${checked ? 'done' : ''}" onclick="toggleCheck('${item.id}','${YEAR}')">
+            <div class="check-box">${checked ? '✓' : ''}</div>
+            <div class="check-text">
+              <div class="check-label">${item.label}</div>
+              <div class="check-due">Due: ${item.due}</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+  }).join('');
+}
+
+function toggleCheck(id, year) {
+  const key = id + '_' + year;
+  D.checklist[key] = !D.checklist[key];
+  save();
+  renderChecklist();
+  // update dashboard stats if visible
+  const dashAlertEl = document.getElementById('statChecklist');
+  if (dashAlertEl) {
+    const done = CHECKLIST.filter(i => D.checklist[i.id + '_' + year]).length;
+    const pct = Math.round((done / CHECKLIST.length) * 100);
+    dashAlertEl.textContent = pct + '%';
+    document.getElementById('checklistBar').style.width = pct + '%';
+    document.getElementById('statChecklistSub').textContent = `${done}/${CHECKLIST.length} done`;
+  }
+}
+
+function renderSettings() {
+  const s = D.settings;
+  document.getElementById('s_ein').value = s.ein || '';
+  document.getElementById('s_cslb').value = s.cslb || '';
+  document.getElementById('s_address').value = s.address || '';
+  document.getElementById('s_phone').value = s.phone || '';
+  document.getElementById('s_email').value = s.email || '';
+  document.getElementById('s_salary').value = s.salary || '';
+  document.getElementById('s_payFreq').value = s.payFreq || 'Bi-weekly';
+  document.getElementById('s_entityNum').value = s.entityNum || '';
+  document.getElementById('s_incMonth').value = s.incMonth || '';
+  document.getElementById('s_siDue').value = s.siDue || '';
+}
+
+function saveSetting(key, value) {
+  D.settings[key] = value;
+  save();
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(D, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `start_construction_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function resetData() {
+  if (!confirm('Reset ALL data? This cannot be undone.')) return;
+  localStorage.removeItem(KEY);
+  location.reload();
+}
+
+// ── SERVICE WORKER ────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+
+
+
+// ── DOCUMENTS ──────────────────────────────────────────────────────
+
+const YEAR = new Date().getFullYear();
+const TODAY = new Date();
+TODAY.setHours(0,0,0,0);
+
+// All recurring S-Corp documents with deadlines
+function getDocDeadlines() {
+  const y = YEAR;
+  const docs = [
+    // ── ANNUAL ──
+    { id:'annual_minutes',    title:'Annual Meeting Minutes',          category:'Corporate',    dueDate: `${y}-01-31`, repeat:'yearly',   overdueDays:null, critical:true,  desc:'Annual board meeting resolution — officers, salary, business plan' },
+    { id:'w2_self',           title:'W-2 to Self (via Gusto)',         category:'Payroll',      dueDate: `${y}-01-31`, repeat:'yearly',   overdueDays:null, critical:true,  desc:'Annual wage statement for yourself as employee' },
+    { id:'1099_nec',          title:'1099-NEC to Subcontractors',      category:'Payroll',      dueDate: `${y}-01-31`, repeat:'yearly',   overdueDays:null, critical:true,  desc:'Required for each sub paid $600+ during the year' },
+    { id:'form_1120s',        title:'Form 1120-S (Federal Return)',    category:'Tax',          dueDate: `${y}-03-15`, repeat:'yearly',   overdueDays:null, critical:true,  desc:'S-Corp federal income tax return — prepared by CPA' },
+    { id:'ca_100s',           title:'CA Form 100S (State Return)',     category:'Tax',          dueDate: `${y}-03-15`, repeat:'yearly',   overdueDays:null, critical:true,  desc:'California S-Corp franchise tax return' },
+    { id:'ca_800',            title:'CA Franchise Tax $800',           category:'Tax',          dueDate: `${y}-04-15`, repeat:'yearly',   overdueDays:null, critical:true,  desc:'Minimum $800 annual CA franchise tax payment to FTB' },
+    { id:'si200',             title:'Statement of Information SI-200', category:'Corporate',    dueDate: D.settings.siDue || `${y}-12-31`, repeat:'yearly', overdueDays:null, critical:true, desc:'Annual filing with CA Secretary of State — $25 fee' },
+    // ── Q1 ──
+    { id:'q1_resolution',     title:'Q1 Distribution Resolution',      category:'Corporate',    dueDate: `${y}-03-31`, repeat:'quarterly', overdueDays:null, critical:true,  desc:'Board resolution authorizing Q1 shareholder distribution' },
+    { id:'q1_est_federal',    title:'Q1 Estimated Tax — Federal',      category:'Tax',          dueDate: `${y}-04-15`, repeat:'quarterly', overdueDays:null, critical:true,  desc:'IRS Form 1040-ES — pay at irs.gov/payments' },
+    { id:'q1_est_ca',         title:'Q1 Estimated Tax — California',   category:'Tax',          dueDate: `${y}-04-15`, repeat:'quarterly', overdueDays:null, critical:true,  desc:'FTB Form 540-ES — pay at ftb.ca.gov' },
+    { id:'q1_941',            title:'Form 941 Q1 (Payroll Tax)',        category:'Payroll',      dueDate: `${y}-04-30`, repeat:'quarterly', overdueDays:null, critical:true,  desc:'Quarterly payroll tax report — Gusto files automatically' },
+    { id:'q1_de9',            title:'CA DE-9 Q1 (CA Payroll)',          category:'Payroll',      dueDate: `${y}-04-30`, repeat:'quarterly', overdueDays:null, critical:true,  desc:'California quarterly payroll — Gusto files automatically' },
+    // ── Q2 ──
+    { id:'q2_resolution',     title:'Q2 Distribution Resolution',      category:'Corporate',    dueDate: `${y}-06-30`, repeat:'quarterly', overdueDays:null, critical:true,  desc:'Board resolution authorizing Q2 shareholder distribution' },
+    { id:'q2_est_federal',    title:'Q2 Estimated Tax — Federal',      category:'Tax',          dueDate: `${y}-06-15`, repeat:'quarterly', overdueDays:null, critical:true,  desc:'IRS Form 1040-ES — pay at irs.gov/payments' },
+    { id:'q2_est_ca',         title:'Q2 Estimated Tax — California',   category:'Tax',          dueDate: `${y}-06-15`, repeat:'quarterly', overdueDays:null, critical:true,  desc:'FTB Form 540-ES — pay at ftb.ca.gov' },
+    { id:'q2_941',            title:'Form 941 Q2 (Payroll Tax)',        category:'Payroll',      dueDate: `${y}-07-31`, repeat:'quarterly', overdueDays:null, critical:false, desc:'Quarterly payroll tax report — Gusto files automatically' },
+    { id:'q2_de9',            title:'CA DE-9 Q2 (CA Payroll)',          category:'Payroll',      dueDate: `${y}-07-31`, repeat:'quarterly', overdueDays:null, critical:false, desc:'California quarterly payroll — Gusto files automatically' },
+    // ── Q3 ──
+    { id:'q3_resolution',     title:'Q3 Distribution Resolution',      category:'Corporate',    dueDate: `${y}-09-30`, repeat:'quarterly', overdueDays:null, critical:true,  desc:'Board resolution authorizing Q3 shareholder distribution' },
+    { id:'q3_est_federal',    title:'Q3 Estimated Tax — Federal',      category:'Tax',          dueDate: `${y}-09-15`, repeat:'quarterly', overdueDays:null, critical:true,  desc:'IRS Form 1040-ES — pay at irs.gov/payments' },
+    { id:'q3_est_ca',         title:'Q3 Estimated Tax — California',   category:'Tax',          dueDate: `${y}-09-15`, repeat:'quarterly', overdueDays:null, critical:true,  desc:'FTB Form 540-ES — pay at ftb.ca.gov' },
+    { id:'q3_941',            title:'Form 941 Q3 (Payroll Tax)',        category:'Payroll',      dueDate: `${y}-10-31`, repeat:'quarterly', overdueDays:null, critical:false, desc:'Quarterly payroll tax report — Gusto files automatically' },
+    { id:'q3_de9',            title:'CA DE-9 Q3 (CA Payroll)',          category:'Payroll',      dueDate: `${y}-10-31`, repeat:'quarterly', overdueDays:null, critical:false, desc:'California quarterly payroll — Gusto files automatically' },
+    // ── Q4 ──
+    { id:'q4_resolution',     title:'Q4 Distribution Resolution',      category:'Corporate',    dueDate: `${y}-12-31`, repeat:'quarterly', overdueDays:null, critical:true,  desc:'Board resolution authorizing Q4 shareholder distribution' },
+    { id:'q4_est_federal',    title:'Q4 Estimated Tax — Federal',      category:'Tax',          dueDate: `${y+1}-01-15`, repeat:'quarterly', overdueDays:null, critical:true, desc:'IRS Form 1040-ES — pay at irs.gov/payments' },
+    { id:'q4_est_ca',         title:'Q4 Estimated Tax — California',   category:'Tax',          dueDate: `${y+1}-01-15`, repeat:'quarterly', overdueDays:null, critical:true, desc:'FTB Form 540-ES — pay at ftb.ca.gov' },
+    { id:'q4_941',            title:'Form 941 Q4 (Payroll Tax)',        category:'Payroll',      dueDate: `${y+1}-01-31`, repeat:'quarterly', overdueDays:null, critical:false, desc:'Quarterly payroll tax report — Gusto files automatically' },
+    { id:'q4_de9',            title:'CA DE-9 Q4 (CA Payroll)',          category:'Payroll',      dueDate: `${y+1}-01-31`, repeat:'quarterly', overdueDays:null, critical:false, desc:'California quarterly payroll — Gusto files automatically' },
+  ];
+
+  return docs.map(d => {
+    const days = daysUntil(d.dueDate);
+    d.days = days;
+    d.status = days === null ? 'empty' : days < 0 ? 'overdue' : days <= 14 ? 'critical' : days <= 45 ? 'warning' : 'ok';
+    return d;
+  }).sort((a,b) => (a.days === null ? 999 : a.days) - (b.days === null ? 999 : b.days));
+}
+
+// GENERATABLE docs — ones we can auto-fill
+const GENERATABLE = ['annual_minutes','q1_resolution','q2_resolution','q3_resolution','q4_resolution','1099_nec','w2_self'];
+
+function renderDocuments() {
+  const docs = getDocDeadlines();
+  const overdue = docs.filter(d => d.status === 'overdue');
+  const upcoming = docs.filter(d => d.status !== 'overdue').slice(0, 12);
+
+  // Overdue banner
+  const ob = document.getElementById('docsOverdueBanner');
+  if (overdue.length > 0) {
+    ob.innerHTML = '<div style="height:14px"></div>' + overdue.map(d => `
+      <div class="alert-banner critical">
+        <div class="alert-icon">🚨</div>
+        <div>
+          <div class="alert-text">${d.title}</div>
+          <div class="alert-sub">OVERDUE by ${Math.abs(d.days)} days · was due ${fmtDate(d.dueDate)}</div>
+          ${GENERATABLE.includes(d.id) ? `<button class="btn btn-danger btn-sm" style="margin-top:8px" onclick="generateDoc('${d.id}')">Generate Now →</button>` : ''}
+        </div>
+      </div>`).join('');
+  } else {
+    ob.innerHTML = '';
+  }
+
+  // Upcoming deadlines
+  const catColors = { 'Corporate':'var(--blue)', 'Tax':'var(--red)', 'Payroll':'var(--green)' };
+  document.getElementById('docsDeadlines').innerHTML = upcoming.map(d => {
+    const statusColor = d.status === 'critical' ? 'var(--red)' : d.status === 'warning' ? 'var(--yellow)' : 'var(--green)';
+    const daysLabel = d.days === null ? '—' : d.days === 0 ? 'TODAY' : d.days < 0 ? `${Math.abs(d.days)}d overdue` : `${d.days}d`;
+    const canGen = GENERATABLE.includes(d.id);
+    return `
+      <div class="row" style="align-items:flex-start;padding:14px 16px">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <span style="font-size:9px;font-family:var(--mono);font-weight:700;padding:2px 6px;border-radius:3px;background:${catColors[d.category]}22;color:${catColors[d.category]}">${d.category}</span>
+            <span style="font-size:10px;font-family:var(--mono);color:${statusColor};font-weight:700">${daysLabel}</span>
+          </div>
+          <div style="font-size:13px;font-weight:700;margin-bottom:2px">${d.title}</div>
+          <div style="font-size:11px;color:var(--muted2);font-family:var(--mono)">${fmtDate(d.dueDate)} · ${d.desc}</div>
+        </div>
+        ${canGen ? `<button class="btn btn-ghost btn-sm" style="margin-left:10px;flex-shrink:0;margin-top:2px" onclick="generateDoc('${d.id}')">Generate</button>` : ''}
+      </div>`;
+  }).join('');
+
+  // Generator buttons
+  const genDocs = [
+    { id:'annual_minutes',  icon:'🏛', label:'Annual Meeting
+Minutes' },
+    { id:'q1_resolution',   icon:'📄', label:'Q1 Distribution
+Resolution' },
+    { id:'q2_resolution',   icon:'📄', label:'Q2 Distribution
+Resolution' },
+    { id:'q3_resolution',   icon:'📄', label:'Q3 Distribution
+Resolution' },
+    { id:'q4_resolution',   icon:'📄', label:'Q4 Distribution
+Resolution' },
+    { id:'w9_request',      icon:'📋', label:'W-9 Request
+to Sub' },
+    { id:'major_decision',  icon:'⚖',  label:'Major Decision
+Resolution' },
+    { id:'client_contract', icon:'🔨', label:'Client Contract
+Template' },
+  ];
+
+  document.getElementById('docButtons').innerHTML = genDocs.map(b => `
+    <button onclick="generateDoc('${b.id}')" style="
+      display:flex;flex-direction:column;align-items:center;gap:8px;
+      padding:16px 10px;background:#fff;border:1px solid var(--border);
+      border-radius:10px;cursor:pointer;font-family:'Syne',sans-serif;
+      font-size:11px;font-weight:700;color:var(--text);line-height:1.3;
+      text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.06);
+      transition:border-color .15s;
+    " onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+      <span style="font-size:28px">${b.icon}</span>
+      <span>${b.label.replace('\n','<br>')}</span>
+    </button>`).join('');
+}
+
+function generateDoc(id) {
+  const s = D.settings;
+  const co = 'Start Construction, Inc.';
+  const epa608 = s.epa608 || 'OiNXMYM1DG';
+  const ein = s.ein || '99-1788037';
+  const cslb = s.cslb || '1123785';
+  const addr = s.address || '2800 Walnut Ave, Apt 43, Carmichael, CA 95608';
+  const email = s.email || 'alexandr.zakirov@gmail.com';
+  const phone = s.phone || '(916) 225-0793';
+  const salary = s.salary ? '$' + Number(s.salary).toLocaleString() : '[Salary — set in Settings]';
+  const now = new Date();
+  const todayStr = now.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
+  const y = now.getFullYear();
+  const dueDate5 = new Date(now.getTime() + 5*86400000).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+
+  // Find last distribution for amount reference
+  const lastDist = D.distributions.length > 0 ? D.distributions[D.distributions.length-1] : null;
+  const distAmount = lastDist ? '$' + Number(lastDist.amount).toLocaleString() : '[DISTRIBUTION AMOUNT]';
+
+  let title = '', dueLabel = '', content = '';
+
+  if (id === 'annual_minutes') {
+    title = 'Annual Meeting Minutes';
+    dueLabel = `Due: January 31, ${y}`;
+    content = `================================================================================
+              ANNUAL MEETING OF THE BOARD OF DIRECTORS
+                         ${co}
+                    A California S-Corporation
+================================================================================
+
+Date:       ${todayStr}
+Time:       [TIME — e.g., 10:00 AM]
+Location:   ${addr || 'Principal office of the corporation'}
+
+DIRECTORS PRESENT:
+  Aleksandr Zakirov, Director, President & Secretary
+
+CALLED TO ORDER:
+The meeting was called to order at [TIME]. A quorum was present.
+
+─────────────────────────────────────────────────────────────────────────────
+AGENDA ITEM 1 — REVIEW OF PRIOR YEAR FINANCIALS
+─────────────────────────────────────────────────────────────────────────────
+  Total Revenue ${y-1}:    $[AMOUNT]
+  Total Expenses ${y-1}:   $[AMOUNT]
+  Net Income ${y-1}:       $[AMOUNT]
+  Total Distributions:     $[AMOUNT]
+  W-2 Salary Paid:         ${salary}
+
+  RESOLVED: The financial results for ${y-1} are hereby reviewed and approved.
+
+─────────────────────────────────────────────────────────────────────────────
+AGENDA ITEM 2 — OFFICER ELECTIONS FOR ${y}
+─────────────────────────────────────────────────────────────────────────────
+  RESOLVED: The following officers are elected for the ${y} fiscal year:
+
+    President & CEO:   Aleksandr Zakirov
+    Secretary:         Aleksandr Zakirov
+    Treasurer:         Aleksandr Zakirov
+
+─────────────────────────────────────────────────────────────────────────────
+AGENDA ITEM 3 — SHAREHOLDER COMPENSATION
+─────────────────────────────────────────────────────────────────────────────
+  RESOLVED: The annual W-2 salary for Aleksandr Zakirov as employee
+  of ${co} is set at ${salary} for fiscal year ${y},
+  payable through the company payroll system (Gusto).
+
+  This amount represents reasonable compensation for services rendered
+  as President, General Contractor, and primary operator.
+
+─────────────────────────────────────────────────────────────────────────────
+AGENDA ITEM 4 — DISTRIBUTION POLICY FOR ${y}
+─────────────────────────────────────────────────────────────────────────────
+  RESOLVED: The corporation may make quarterly shareholder distributions
+  from net profits as approved by the Board. Each distribution shall be
+  accompanied by a written resolution prior to payment.
+
+─────────────────────────────────────────────────────────────────────────────
+AGENDA ITEM 5 — BUSINESS PLAN ${y}
+─────────────────────────────────────────────────────────────────────────────
+  [Describe projects, goals, new contracts, equipment purchases, hiring plans]
+
+─────────────────────────────────────────────────────────────────────────────
+AGENDA ITEM 6 — CSLB LICENSE & COMPLIANCE
+─────────────────────────────────────────────────────────────────────────────
+  RESOLVED: The corporation shall maintain CSLB License #${cslb} in
+  good standing, including timely renewal of the contractor's bond and
+  all required insurance policies.
+
+  RESOLVED: The corporation acknowledges that Aleksandr Zakirov holds
+  EPA 608 Universal Certification (Certificate #${epa608}) which is
+  required for refrigerant handling in HVAC operations.
+
+─────────────────────────────────────────────────────────────────────────────
+ADJOURNMENT
+─────────────────────────────────────────────────────────────────────────────
+  There being no further business, the meeting was adjourned.
+
+================================================================================
+IN WITNESS WHEREOF, the undersigned executes these minutes:
+
+
+_________________________________________    Date: _________________
+Aleksandr Zakirov
+Director, President & Secretary
+${co}
+EIN: ${ein}
+CSLB License: #${cslb}
+
+================================================================================
+File in: 02_CORPORATE_RECORDS/${y}/Annual_Meeting_Minutes_${y}.pdf
+================================================================================`;
+  }
+
+  else if (id.endsWith('_resolution')) {
+    const qNum = id.charAt(1);
+    const qMap = { '1':['January 1','March 31','April 15'], '2':['April 1','June 30','June 15'], '3':['July 1','September 30','September 15'], '4':['October 1','December 31','January 15'] };
+    const [qStart, qEnd, taxDue] = qMap[qNum] || ['[START]','[END]','[DUE]'];
+    title = `Q${qNum} Distribution Resolution`;
+    dueLabel = `Due before transfer · Tax payment by ${taxDue}, ${qNum==='4'?y+1:y}`;
+    content = `================================================================================
+       UNANIMOUS WRITTEN CONSENT OF THE BOARD OF DIRECTORS
+                      ${co}
+                  A California S-Corporation
+             In Lieu of a Special Meeting of Directors
+================================================================================
+
+Date:     ${todayStr}
+Quarter:  Q${qNum} ${y}  (${qStart} – ${qEnd}, ${y})
+
+The undersigned, being all of the Directors of ${co},
+hereby adopt the following resolution without a formal meeting:
+
+─────────────────────────────────────────────────────────────────────────────
+DISTRIBUTION RESOLUTION
+─────────────────────────────────────────────────────────────────────────────
+
+RESOLVED: The Board of Directors hereby authorizes and approves a cash
+distribution to the shareholder of the corporation as follows:
+
+  Distribution Amount:      ${distAmount}
+  Payment Date:             On or before ${dueDate5}
+  Shareholder:              Aleksandr Zakirov
+  Ownership:                100%
+  Bank Transfer Memo:       "Q${qNum} ${y} Shareholder Distribution"
+
+FURTHER RESOLVED: This distribution is made from Q${qNum} ${y} earnings.
+The corporation confirms it will remain solvent after this distribution
+and is able to meet all current and future obligations.
+
+FURTHER RESOLVED: This distribution is NOT wages and is NOT subject to
+payroll or self-employment tax. The shareholder-employee has received
+separate W-2 compensation of ${salary}/year through company payroll.
+
+─────────────────────────────────────────────────────────────────────────────
+ESTIMATED TAX REMINDER
+─────────────────────────────────────────────────────────────────────────────
+  ☐ Set aside ~30% of distribution for estimated taxes
+  ☐ Pay Federal 1040-ES by ${taxDue}, ${qNum==='4'?y+1:y} → irs.gov/payments
+  ☐ Pay CA 540-ES by ${taxDue}, ${qNum==='4'?y+1:y}  → ftb.ca.gov
+
+─────────────────────────────────────────────────────────────────────────────
+
+
+_________________________________________    Date: _________________
+Aleksandr Zakirov
+Director & Sole Shareholder
+${co}
+EIN: ${ein}
+
+================================================================================
+File in: 02_CORPORATE_RECORDS/${y}/Q${qNum}_Distribution_Resolution.pdf
+================================================================================`;
+  }
+
+  else if (id === 'w9_request') {
+    title = 'W-9 Request Letter to Subcontractor';
+    dueLabel = 'Send before first payment to any new subcontractor';
+    content = `================================================================================
+                          W-9 REQUEST LETTER
+================================================================================
+
+Date: ${todayStr}
+
+FROM:
+  ${co}
+  ${addr}
+  Phone: ${phone}
+  Email: ${email}
+  EIN:   ${ein}
+
+TO:
+  [SUBCONTRACTOR NAME / COMPANY]
+  [SUBCONTRACTOR ADDRESS]
+
+RE: Required IRS Form W-9 — Taxpayer Identification Number
+
+─────────────────────────────────────────────────────────────────────────────
+
+Dear [Name],
+
+As required by the Internal Revenue Service, we must obtain a completed
+Form W-9 from all subcontractors before issuing payment for services.
+
+WHY THIS IS REQUIRED:
+  If we pay you $600 or more in calendar year ${y}, we are legally
+  required to issue you a Form 1099-NEC by January 31, ${y+1}.
+  We cannot process any payments without a valid W-9 on file.
+
+PLEASE PROVIDE:
+  ☐ Completed and signed IRS Form W-9
+    Download free: https://www.irs.gov/pub/irs-pdf/fw9.pdf
+
+  Return to: ${email}
+
+INFORMATION NEEDED ON W-9:
+  • Legal name (or business name)
+  • Federal tax classification (Individual / LLC / Corporation)
+  • SSN or EIN
+  • Address
+  • Signature and date
+
+Please return the completed W-9 before work begins or within 3 days
+of receiving this letter. Payment cannot be processed without it.
+
+Thank you for your prompt attention.
+
+Sincerely,
+
+
+_________________________________________    Date: _________________
+Aleksandr Zakirov, President
+${co}
+CSLB License: #${cslb}
+
+================================================================================
+File in: 04_PAYROLL/${y}/Subcontractors/W9_Request_[NAME].pdf
+================================================================================`;
+  }
+
+  else if (id === 'major_decision') {
+    title = 'Major Decision Resolution';
+    dueLabel = 'Use for any major business decision (purchase, contract, account)';
+    content = `================================================================================
+           WRITTEN CONSENT OF THE BOARD OF DIRECTORS
+                      ${co}
+                  A California S-Corporation
+================================================================================
+
+Date: ${todayStr}
+Re:   [BRIEF DESCRIPTION OF DECISION]
+
+The undersigned Director hereby adopts the following resolution:
+
+─────────────────────────────────────────────────────────────────────────────
+RESOLVED: That ${co} is hereby authorized to:
+
+  [DESCRIBE THE ACTION IN DETAIL]
+
+  Examples:
+  • Open a business checking/savings account at [BANK NAME]
+  • Purchase equipment: [DESCRIPTION] valued at $[AMOUNT] from [VENDOR]
+  • Enter into a construction contract with [CLIENT] for $[AMOUNT]
+  • Obtain a line of credit up to $[AMOUNT] from [LENDER]
+  • Purchase commercial vehicle: [YEAR/MAKE/MODEL] for $[AMOUNT]
+  • Hire [POSITION]: [NAME] at $[RATE] per [hour/year]
+
+FURTHER RESOLVED: That Aleksandr Zakirov, as President, is authorized
+and directed to execute all documents and take all actions necessary
+to complete the above transaction on behalf of the corporation.
+
+─────────────────────────────────────────────────────────────────────────────
+
+
+_________________________________________    Date: _________________
+Aleksandr Zakirov
+Director & President
+${co}
+EIN: ${ein}
+
+================================================================================
+File in: 02_CORPORATE_RECORDS/${y}/Resolution_[DESCRIPTION]_${y}.pdf
+================================================================================`;
+  }
+
+  else if (id === 'client_contract') {
+    title = 'Client Construction Contract';
+    dueLabel = 'Use for every new project — required before work begins';
+    content = `================================================================================
+                  CONSTRUCTION SERVICES AGREEMENT
+================================================================================
+
+Contract #: SC-${y}-[NUMBER]
+Date:       ${todayStr}
+
+CONTRACTOR:
+  ${co}
+  ${addr}
+  Phone: ${phone} | Email: ${email}
+  CSLB License #: ${cslb}
+  EIN: ${ein}
+
+CLIENT:
+  Name:    [CLIENT FULL NAME]
+  Address: [CLIENT ADDRESS]
+  Phone:   [CLIENT PHONE]
+  Email:   [CLIENT EMAIL]
+
+Project Address: [JOB SITE ADDRESS — if different from above]
+
+================================================================================
+1. SCOPE OF WORK
+================================================================================
+Contractor agrees to perform the following work:
+
+[DETAILED DESCRIPTION OF ALL WORK TO BE PERFORMED]
+
+Materials included: ☐ Yes  ☐ No  ☐ Partial (see below)
+[MATERIALS DETAILS IF APPLICABLE]
+
+================================================================================
+2. CONTRACT PRICE & PAYMENT SCHEDULE
+================================================================================
+  Total Contract Price:               $[TOTAL]
+
+  ☐ Deposit (due at signing):         $[AMOUNT]   ([X]%)
+  ☐ Progress payment (midpoint):      $[AMOUNT]   ([X]%)
+  ☐ Final payment (upon completion):  $[AMOUNT]   ([X]%)
+
+  Payment method: ☐ Check  ☐ Zelle  ☐ ACH  ☐ Cash
+  Make checks payable to: ${co}
+
+  Late payments: 1.5% per month interest after 10 days.
+
+================================================================================
+3. TIMELINE
+================================================================================
+  Start Date:            [DATE]
+  Estimated Completion:  [DATE]
+
+  Timeline subject to weather, permit delays, material availability,
+  or other conditions beyond Contractor's reasonable control.
+
+================================================================================
+4. PERMITS
+================================================================================
+  ☐ Contractor will obtain all required permits (cost included above)
+  ☐ Client will obtain all required permits
+  ☐ No permits required for this scope
+
+================================================================================
+5. CHANGE ORDERS
+================================================================================
+All changes to scope, materials, or price MUST be agreed in writing
+via a signed Change Order BEFORE additional work begins.
+Verbal agreements are NOT binding.
+
+================================================================================
+6. WARRANTY
+================================================================================
+Contractor warrants workmanship for [1 YEAR] from completion date.
+Materials are covered by manufacturer warranty only.
+
+================================================================================
+7. INSURANCE
+================================================================================
+Contractor maintains:
+  • General Liability: $[AMOUNT] per occurrence
+  • Workers' Compensation (if applicable)
+  • Contractor's Bond: $15,000 (CA requirement)
+
+================================================================================
+8. DISPUTE RESOLUTION
+================================================================================
+Disputes shall first be addressed through good-faith negotiation,
+then mediation, then binding arbitration in Sacramento County, CA,
+under California law. Prevailing party entitled to attorney fees.
+
+================================================================================
+9. CANCELLATION (California 3-Day Right)
+================================================================================
+Client has the right to cancel this contract within 3 business days
+of signing without penalty. See attached Notice of Cancellation.
+
+================================================================================
+10. ENTIRE AGREEMENT
+================================================================================
+This document constitutes the entire agreement. All modifications
+must be in writing and signed by both parties.
+
+================================================================================
+SIGNATURES
+================================================================================
+
+CONTRACTOR:                              CLIENT:
+
+_________________________                _________________________
+Aleksandr Zakirov, President                   [CLIENT NAME]
+${co}                    
+Date: ____________________               Date: ____________________
+
+================================================================================
+NOTICE: California law (B&P Code §7159) requires this contract for
+home improvement work over $500. Three-day cancellation rights apply.
+================================================================================
+File in: 06_CONTRACTS/${y}/Contract_[CLIENT]_[PROJECT].pdf
+================================================================================`;
+  }
+
+  if (!content) return;
+
+  document.getElementById('docPreviewArea').style.display = 'block';
+  document.getElementById('docPreviewTitle').textContent = title;
+  document.getElementById('docPreviewDue').textContent = dueLabel;
+  document.getElementById('docPreviewContent').textContent = content;
+
+  // Scroll to preview
+  setTimeout(() => {
+    document.getElementById('docPreviewArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+function printDoc() {
+  window.print();
+}
+
+
+
+// ── VENDORS ────────────────────────────────────────────────────────
+
+const VENDOR_KEY = 'sc_vendors_v1';
+
+const DEFAULT_VENDORS = [
+  {
+    id: 1, name: 'Slakey Brothers', account: '164217',
+    email: 'startconstructioncorp@gmail.com', password: '****0406!',
+    url: '', notes: '', status: 'active', color: '#e05c2a',
+    category: 'HVAC Supply'
+  },
+  {
+    id: 2, name: 'Daikin', account: '290182',
+    email: 'startconstructioncorp@gmail.com', password: '',
+    url: 'https://daikincomfort.com/', notes: '12/21/25 отправил запрос на создание аккаунта. Нужно съездить в офис.',
+    status: 'pending', color: '#0066cc', category: 'HVAC Manufacturer'
+  },
+  {
+    id: 3, name: 'Lennox', account: '',
+    email: '', password: '',
+    url: '', notes: 'Просит ответное письмо, нужно съездить в офис к ним',
+    status: 'pending', color: '#cc2200', category: 'HVAC Manufacturer'
+  },
+  {
+    id: 4, name: 'Supply House', account: 'Start Construction Inc',
+    email: 'startconstructioncorp@gmail.com', password: '',
+    url: 'https://supplyhouse.com/trademaster', notes: '',
+    status: 'active', color: '#2a7a2a', category: 'HVAC Supply'
+  },
+  {
+    id: 5, name: 'RSD - Refrigeration Supplies Distributor', account: '',
+    email: '', password: '',
+    url: '', notes: 'Нужен номер аккаунта — создать в магазине',
+    status: 'needed', color: '#8b4513', category: 'Refrigeration'
+  },
+  {
+    id: 6, name: 'United Refrigeration Inc', account: '11436488',
+    email: 'startconstructioncorp@gmail.com', password: '',
+    url: 'https://www.uri.com/login', notes: '',
+    status: 'active', color: '#1a5fa8', category: 'Refrigeration'
+  },
+  {
+    id: 7, name: 'Sigler', account: '114793000',
+    email: 'startconstructioncorp@gmail.com', password: '',
+    url: 'https://www.siglers.com/', notes: 'Нужен токен — отправил запрос',
+    status: 'pending', color: '#7a3fa0', category: 'HVAC Supply'
+  },
+  {
+    id: 8, name: 'Ferguson', account: '',
+    email: 'startconstructioncorp@gmail.com', password: '',
+    url: 'https://www.ferguson.com/', notes: '',
+    status: 'active', color: '#cc6600', category: 'Plumbing/HVAC'
+  },
+  {
+    id: 9, name: 'Reliableparts', account: '7111480',
+    email: 'startconstructioncorp@gmail.com', password: '',
+    url: 'https://www.reliableparts.com/', notes: '',
+    status: 'active', color: '#2a6b8a', category: 'Parts'
+  },
+  {
+    id: 10, name: 'Marcone', account: '',
+    email: '', password: '',
+    url: 'https://beta.marcone.com/', notes: 'Отправил запрос 12/28',
+    status: 'pending', color: '#555555', category: 'Parts'
+  },
+];
+
+function loadVendors() {
+  try {
+    const r = localStorage.getItem(VENDOR_KEY);
+    return r ? JSON.parse(r) : DEFAULT_VENDORS;
+  } catch { return DEFAULT_VENDORS; }
+}
+
+function saveVendors(vendors) {
+  try { localStorage.setItem(VENDOR_KEY, JSON.stringify(vendors)); } catch {}
+}
+
+let vendorOpenId = null;
+
+function renderVendors() {
+  let vendors = loadVendors();
+  const search = (document.getElementById('vendorSearch')?.value || '').toLowerCase();
+  if (search) vendors = vendors.filter(v =>
+    v.name.toLowerCase().includes(search) ||
+    v.account.toLowerCase().includes(search) ||
+    v.category.toLowerCase().includes(search) ||
+    v.notes.toLowerCase().includes(search)
+  );
+
+  // Stats
+  const total = vendors.length;
+  const active = vendors.filter(v => v.status === 'active').length;
+  const pending = vendors.filter(v => v.status === 'pending').length;
+  const needed = vendors.filter(v => v.status === 'needed').length;
+
+  document.getElementById('vendorStats').innerHTML = [
+    { label:'Total', value: total, color:'var(--text)' },
+    { label:'Active', value: active, color:'var(--green)' },
+    { label:'Pending', value: pending, color:'var(--yellow)' },
+    { label:'Need Account', value: needed, color:'var(--red)' },
+  ].map(s => `
+    <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 14px;flex-shrink:0">
+      <div style="font-size:9px;font-family:var(--mono);color:var(--muted2);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">${s.label}</div>
+      <div style="font-size:22px;font-weight:800;color:${s.color}">${s.value}</div>
+    </div>`).join('');
+
+  // Group by category
+  const cats = {};
+  vendors.forEach(v => {
+    if (!cats[v.category]) cats[v.category] = [];
+    cats[v.category].push(v);
+  });
+
+  let html = '';
+  Object.keys(cats).forEach(cat => {
+    html += `<div style="font-size:9px;font-family:var(--mono);color:var(--muted2);text-transform:uppercase;letter-spacing:2px;padding:12px 16px 6px;font-weight:700">${cat}</div>`;
+    cats[cat].forEach(v => {
+      const isOpen = vendorOpenId === v.id;
+      const statusMap = {
+        active: ['vs-active','✓ Active'],
+        pending: ['vs-pending','⏳ Pending'],
+        needed: ['vs-needed','⚠ Need Account']
+      };
+      const [scls, slabel] = statusMap[v.status] || ['vs-active','Active'];
+      const initial = v.name.charAt(0).toUpperCase();
+
+      html += `
+        <div class="vendor-card">
+          <div class="vendor-head" onclick="toggleVendor(${v.id})">
+            <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
+              <div class="vendor-logo" style="background:${v.color}">${initial}</div>
+              <div style="min-width:0">
+                <div class="vendor-name">${v.name}</div>
+                <div class="vendor-account">${v.account ? 'Acct: ' + v.account : 'No account number'}</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+              <span class="vendor-status-badge ${scls}">${slabel}</span>
+              <span style="color:var(--muted2);font-size:14px">${isOpen ? '▾' : '▸'}</span>
+            </div>
+          </div>
+          <div class="vendor-body ${isOpen ? 'open' : ''}">
+            ${v.account ? `<div class="vendor-field"><span class="vendor-field-label">Account</span><span class="vendor-field-value" style="font-weight:700">${v.account}</span></div>` : ''}
+            ${v.email ? `<div class="vendor-field"><span class="vendor-field-label">Email</span><span class="vendor-field-value"><a href="mailto:${v.email}" style="color:var(--blue);text-decoration:none">${v.email}</a></span></div>` : ''}
+            ${v.password ? `<div class="vendor-field"><span class="vendor-field-label">Password</span><span class="vendor-field-value" id="vpwd_${v.id}" style="letter-spacing:3px">••••••••</span><button onclick="togglePwd(${v.id},'${v.password}')" style="background:none;border:none;color:var(--blue);font-size:11px;cursor:pointer;margin-left:8px">Show</button></div>` : ''}
+            ${v.url ? `<div class="vendor-field"><span class="vendor-field-label">Portal</span><span class="vendor-field-value"><a href="${v.url}" target="_blank" style="color:var(--blue);text-decoration:none">${v.url.replace('https://','')}</a></span></div>` : ''}
+            ${v.notes ? `<div class="vendor-field"><span class="vendor-field-label">Notes</span><span class="vendor-field-value" style="color:var(--muted2);font-style:italic">${v.notes}</span></div>` : ''}
+            <div style="display:flex;gap:8px;margin-top:12px">
+              ${v.url ? `<a href="${v.url}" target="_blank" class="btn btn-primary btn-sm" style="text-decoration:none;flex:1;justify-content:center">🌐 Open Portal</a>` : ''}
+              <button class="btn btn-ghost btn-sm" style="flex:1" onclick="editVendor(${v.id})">✏ Edit</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteVendor(${v.id})">✕</button>
+            </div>
+          </div>
+        </div>`;
+    });
+  });
+
+  if (vendors.length === 0) {
+    html = '<div style="padding:32px 16px;text-align:center;color:var(--muted2);font-family:var(--mono);font-size:12px">No vendors found</div>';
+  }
+
+  document.getElementById('vendorList').innerHTML = html;
+}
+
+function toggleVendor(id) {
+  vendorOpenId = vendorOpenId === id ? null : id;
+  renderVendors();
+}
+
+function togglePwd(id, pwd) {
+  const el = document.getElementById('vpwd_' + id);
+  if (!el) return;
+  if (el.textContent === '••••••••') {
+    el.textContent = pwd;
+    el.style.letterSpacing = 'normal';
+  } else {
+    el.textContent = '••••••••';
+    el.style.letterSpacing = '3px';
+  }
+}
+
+function editVendor(id) {
+  const vendors = loadVendors();
+  const v = vendors.find(x => x.id === id);
+  if (!v) return;
+  document.getElementById('ev_id').value = v.id;
+  document.getElementById('ev_name').value = v.name;
+  document.getElementById('ev_account').value = v.account || '';
+  document.getElementById('ev_email').value = v.email || '';
+  document.getElementById('ev_password').value = v.password || '';
+  document.getElementById('ev_url').value = v.url || '';
+  document.getElementById('ev_category').value = v.category || '';
+  document.getElementById('ev_notes').value = v.notes || '';
+  document.getElementById('ev_status').value = v.status || 'active';
+  openModal('editVendorModal');
+}
+
+function saveVendorEdit() {
+  const id = Number(document.getElementById('ev_id').value);
+  const vendors = loadVendors();
+  const idx = vendors.findIndex(v => v.id === id);
+  if (idx === -1) return;
+  vendors[idx] = {
+    ...vendors[idx],
+    name: document.getElementById('ev_name').value,
+    account: document.getElementById('ev_account').value,
+    email: document.getElementById('ev_email').value,
+    password: document.getElementById('ev_password').value,
+    url: document.getElementById('ev_url').value,
+    category: document.getElementById('ev_category').value,
+    notes: document.getElementById('ev_notes').value,
+    status: document.getElementById('ev_status').value,
+  };
+  saveVendors(vendors);
+  showToast('✓ Vendor saved');
+  closeModal('editVendorModal');
+  renderVendors();
+}
+
+function addNewVendor() {
+  const name = document.getElementById('nv_name').value.trim();
+  if (!name) return;
+  const vendors = loadVendors();
+  const colors = ['#e05c2a','#0066cc','#cc2200','#2a7a2a','#1a5fa8','#7a3fa0','#cc6600','#2a6b8a'];
+  vendors.push({
+    id: Date.now(),
+    name,
+    account: document.getElementById('nv_account').value,
+    email: document.getElementById('nv_email').value,
+    password: document.getElementById('nv_password').value,
+    url: document.getElementById('nv_url').value,
+    category: document.getElementById('nv_category').value || 'Other',
+    notes: document.getElementById('nv_notes').value,
+    status: document.getElementById('nv_status').value || 'active',
+    color: colors[vendors.length % colors.length],
+  });
+  saveVendors(vendors);
+  showToast('✓ Vendor added');
+  closeModal('addVendorModal');
+  ['nv_name','nv_account','nv_email','nv_password','nv_url','nv_category','nv_notes'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  renderVendors();
+}
+
+function deleteVendor(id) {
+  if (!confirm('Delete this vendor?')) return;
+  const vendors = loadVendors().filter(v => v.id !== id);
+  saveVendors(vendors);
+  if (vendorOpenId === id) vendorOpenId = null;
+  renderVendors();
+}
+
+
+// ── VAULT ──────────────────────────────────────────────────────────
+
+const GDRIVE_KEY = 'sc_gdrive_v2';
+let vaultFilter = 'All';
+
+// Required documents list (matches what's in the screenshot + more)
+const REQUIRED_DOCS = [
+  { id:'articles',      label:'Articles of Incorporation',          icon:'🏛', category:'Formation' },
+  { id:'bylaws',        label:'Corporate Bylaws',                   icon:'📜', category:'Formation' },
+  { id:'ein',           label:'EIN / Tax ID Number Letter',         icon:'🔢', category:'Formation' },
+  { id:'2553',          label:'IRS Form 2553 (S-Corp Election)',    icon:'📋', category:'Formation' },
+  { id:'statement_inc', label:'Statement of the Incorporator',      icon:'📄', category:'Formation' },
+  { id:'biz_entity',    label:'Business Entity Filing Acknowledgment', icon:'📄', category:'Formation' },
+  { id:'banking_res',   label:'Banking Resolution',                 icon:'🏦', category:'Formation' },
+  { id:'meeting_min',   label:'Annual Meeting Minutes (current)',   icon:'🗓', category:'Corporate' },
+  { id:'si200',         label:'Statement of Information (SI-200)',  icon:'🏛', category:'Corporate' },
+  { id:'cslb_lic',      label:'CSLB Contractor License',            icon:'🔨', category:'Licenses' },
+  { id:'cslb_bond',     label:"Contractor's Bond Certificate",      icon:'🔗', category:'Licenses' },
+  { id:'gl_policy',     label:'General Liability Insurance Policy', icon:'🛡', category:'Insurance' },
+  { id:'wc_policy',     label:'Workers Compensation Policy',        icon:'👷', category:'Insurance' },
+  { id:'auto_policy',   label:'Commercial Auto Insurance',          icon:'🚗', category:'Insurance' },
+  { id:'w2_current',    label:'W-2 Current Year (self)',            icon:'💵', category:'Tax' },
+  { id:'1120s_current', label:'Form 1120-S Current Year',           icon:'📊', category:'Tax' },
+  { id:'ca100s_current',label:'CA Form 100S Current Year',          icon:'📊', category:'Tax' },
+  { id:'usps_1583',     label:'USPS Form 1583',                     icon:'📮', category:'Other' },
+  { id:'epa608',        label:'EPA 608 Universal Certification',    icon:'♻️', category:'Licenses' },
+  { id:'boir',          label:'BOIR (Beneficial Ownership Report)',  icon:'🏦', category:'Formation' },
+];
+
+const FILE_CATEGORIES = ['All', 'Formation', 'Corporate', 'Licenses', 'Insurance', 'Tax', 'Payroll', 'Contracts', 'Other'];
+
+const FILE_ICONS = {
+  'pdf':'🔴', 'doc':'🔵', 'docx':'🔵', 'xls':'🟢', 'xlsx':'🟢',
+  'png':'🟣', 'jpg':'🟣', 'jpeg':'🟣', 'heic':'🟣', 'gif':'🟣',
+  'txt':'⬜', 'csv':'🟢', 'zip':'🟡',
+};
+
+const CAT_COLORS = {
+  'Formation':'#1450a0', 'Corporate':'#b56e00', 'Licenses':'#166638',
+  'Insurance':'#8b2fc9', 'Tax':'#b52a1c', 'Payroll':'#0d7c66',
+  'Contracts':'#c44b00', 'Other':'#5a6370'
+};
+
+function loadVault() {
+  try {
+    const r = localStorage.getItem(VAULT_KEY);
+    return r ? JSON.parse(r) : [];
+  } catch { return []; }
+}
+
+function saveVault(files) {
+  try { localStorage.setItem(VAULT_KEY, JSON.stringify(files)); } catch(e) {
+    showToast('⚠ Storage full — delete old files');
+  }
+}
+
+function getFileExt(name) {
+  return (name.split('.').pop() || '').toLowerCase();
+}
+
+function getFileIcon(name) {
+  return FILE_ICONS[getFileExt(name)] || '📁';
+}
+
+function fmtSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/1024/1024).toFixed(1) + ' MB';
+}
+
+function handleFileUpload(event) {
+  const files = Array.from(event.target.files);
+  if (!files.length) return;
+  const vault = loadVault();
+
+  let loaded = 0;
+  files.forEach(file => {
+    if (file.size > 10 * 1024 * 1024) {
+      showToast('⚠ ' + file.name + ' too large (max 10MB)');
+      loaded++;
+      if (loaded === files.length) renderVault();
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = e => {
+      // Auto-detect category from filename
+      const name = file.name.toLowerCase();
+      let category = 'Other';
+      if (name.match(/articles|bylaws|ein|2553|incorporat|banking.res|entity.fil/)) category = 'Formation';
+      else if (name.match(/minutes|meeting|si.?200|statement.of.info|resolution/)) category = 'Corporate';
+      else if (name.match(/cslb|license|bond|permit/)) category = 'Licenses';
+      else if (name.match(/insurance|liability|workers.?comp|wc|auto.ins|policy|umbrella/)) category = 'Insurance';
+      else if (name.match(/1120|100s|w.?2|1040|tax.return|941|de.?9|k.?1|1099/)) category = 'Tax';
+      else if (name.match(/payroll|paystub|pay.stub|gusto|w.?9/)) category = 'Payroll';
+      else if (name.match(/contract|agreement|proposal|bid/)) category = 'Contracts';
+
+      const entry = {
+        id: Date.now() + Math.random(),
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        category,
+        uploadedAt: new Date().toISOString(),
+        data: e.target.result,
+        linkedReqId: null,
+      };
+
+      // Auto-link to required doc
+      const fname = file.name.toLowerCase();
+      REQUIRED_DOCS.forEach(req => {
+        if (req.id === 'articles' && fname.match(/articles/)) entry.linkedReqId = req.id;
+        else if (req.id === 'bylaws' && fname.match(/bylaw/)) entry.linkedReqId = req.id;
+        else if (req.id === 'ein' && fname.match(/ein|tax.id/)) entry.linkedReqId = req.id;
+        else if (req.id === '2553' && fname.match(/2553/)) entry.linkedReqId = req.id;
+        else if (req.id === 'banking_res' && fname.match(/banking/)) entry.linkedReqId = req.id;
+        else if (req.id === 'meeting_min' && fname.match(/minutes|meeting/)) entry.linkedReqId = req.id;
+        else if (req.id === 'si200' && fname.match(/si.?200|statement.of.info/)) entry.linkedReqId = req.id;
+        else if (req.id === 'cslb_lic' && fname.match(/cslb|license/)) entry.linkedReqId = req.id;
+        else if (req.id === 'gl_policy' && fname.match(/liability/)) entry.linkedReqId = req.id;
+        else if (req.id === 'usps_1583' && fname.match(/1583/)) entry.linkedReqId = req.id;
+      });
+
+      vault.push(entry);
+      loaded++;
+      if (loaded === files.length) {
+        saveVault(vault);
+        showToast('✓ ' + files.length + ' file' + (files.length > 1 ? 's' : '') + ' saved');
+        renderVault();
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+
+  event.target.value = '';
+}
+
+function downloadFile(id) {
+  const vault = loadVault();
+  const file = vault.find(f => f.id === id);
+  if (!file) return;
+  const a = document.createElement('a');
+  a.href = file.data;
+  a.download = file.name;
+  a.click();
+}
+
+function viewFile(id) {
+  const vault = loadVault();
+  const file = vault.find(f => f.id === id);
+  if (!file) return;
+  const ext = getFileExt(file.name);
+  if (['png','jpg','jpeg','gif','webp','heic'].includes(ext) || file.type.startsWith('image/')) {
+    const w = window.open();
+    w.document.write('<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="' + file.data + '" style="max-width:100%;max-height:100vh"></body></html>');
+  } else if (ext === 'pdf' || file.type === 'application/pdf') {
+    const w = window.open();
+    w.document.write('<html><body style="margin:0"><embed src="' + file.data + '" width="100%" height="100%" type="application/pdf"></body></html>');
+  } else {
+    downloadFile(id);
+  }
+}
+
+function deleteFile(id) {
+  if (!confirm('Delete this file?')) return;
+  const vault = loadVault().filter(f => f.id !== id);
+  saveVault(vault);
+  showToast('🗑 Deleted');
+  renderVault();
+}
+
+function changeCat(id, newCat) {
+  const vault = loadVault();
+  const file = vault.find(f => f.id === id);
+  if (file) { file.category = newCat; saveVault(vault); renderVault(); }
+}
+
+function renderVault() {
+  let vault = loadVault();
+  const search = (document.getElementById('vaultSearch')?.value || '').toLowerCase();
+
+  // Storage info
+  const totalSize = vault.reduce((s, f) => s + (f.size || 0), 0);
+  document.getElementById('storageInfo').textContent =
+    vault.length + ' file' + (vault.length !== 1 ? 's' : '') + ' · ' + fmtSize(totalSize);
+
+  // Category filters
+  const cats = FILE_CATEGORIES.filter(c => c === 'All' || vault.some(f => f.category === c));
+  document.getElementById('vaultFilters').innerHTML = cats.map(c =>
+    `<button class="filter-btn ${vaultFilter === c ? 'active' : ''}" onclick="vaultFilter='${c}';renderVault()">${c}</button>`
+  ).join('');
+
+  // Filter files
+  let filtered = vault;
+  if (vaultFilter !== 'All') filtered = filtered.filter(f => f.category === vaultFilter);
+  if (search) filtered = filtered.filter(f => f.name.toLowerCase().includes(search));
+
+  // Sort by upload date desc
+  filtered.sort((a,b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+
+  const list = document.getElementById('vaultFileList');
+
+  if (filtered.length === 0) {
+    list.innerHTML = vault.length === 0
+      ? `<div class="empty-vault">
+          <div style="font-size:48px;margin-bottom:12px">📂</div>
+          <div style="font-weight:700;font-size:14px;color:var(--text);margin-bottom:8px">Vault is empty</div>
+          <div>Tap the upload area above<br>to add your company documents</div>
+          <div style="margin-top:12px;padding:10px 14px;background:var(--surface2);border-radius:8px;text-align:left">
+            From the screenshot, you have:<br>
+            Articles of Incorporation<br>
+            Banking Resolution<br>
+            Corporate Bylaws<br>
+            EIN / Tax ID Number<br>
+            IRS Form 2553<br>
+            Meeting Minutes<br>
+            Statement of Information<br>
+            …and more — upload them all here
+          </div>
+        </div>`
+      : `<div class="empty-vault">No files match "${search || vaultFilter}"</div>`;
+    return;
+  }
+
+  // Group by category
+  const groups = {};
+  filtered.forEach(f => {
+    if (!groups[f.category]) groups[f.category] = [];
+    groups[f.category].push(f);
+  });
+
+  let html = '';
+  Object.keys(groups).forEach(cat => {
+    const color = CAT_COLORS[cat] || 'var(--muted2)';
+    html += `<div style="font-size:9px;font-family:var(--mono);font-weight:700;color:${color};text-transform:uppercase;letter-spacing:2px;padding:14px 16px 6px">${cat} (${groups[cat].length})</div>`;
+    html += '<div class="card" style="margin-bottom:10px">';
+    groups[cat].forEach(file => {
+      const uploadDate = new Date(file.uploadedAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+      html += `
+        <div class="file-row">
+          <div class="file-icon-box" style="background:${color}18">${getFileIcon(file.name)}</div>
+          <div class="file-info" onclick="viewFile(${file.id})" style="cursor:pointer">
+            <div class="file-name">${file.name}</div>
+            <div class="file-meta">${fmtSize(file.size)} · ${uploadDate} · ${file.category}</div>
+          </div>
+          <div class="file-actions">
+            <button class="btn btn-ghost btn-sm" onclick="viewFile(${file.id})" title="View">👁</button>
+            <button class="btn btn-ghost btn-sm" onclick="downloadFile(${file.id})" title="Download">⬇</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteFile(${file.id})" title="Delete">✕</button>
+          </div>
+        </div>`;
+    });
+    html += '</div>';
+  });
+  list.innerHTML = html;
+
+  // Required docs checklist
+  const uploadedReqIds = new Set(vault.map(f => f.linkedReqId).filter(Boolean));
+  const linkedNames = new Set();
+  vault.forEach(f => {
+    if (f.linkedReqId) linkedNames.add(f.name.toLowerCase());
+  });
+
+  // Also fuzzy-match by filename for display
+  function isUploaded(req) {
+    if (uploadedReqIds.has(req.id)) return true;
+    const n = req.label.toLowerCase();
+    return vault.some(f => {
+      const fn = f.name.toLowerCase();
+      if (req.id === 'articles') return fn.includes('articles');
+      if (req.id === 'bylaws') return fn.includes('bylaw');
+      if (req.id === 'ein') return fn.includes('ein') || fn.includes('tax id');
+      if (req.id === '2553') return fn.includes('2553');
+      if (req.id === 'meeting_min') return fn.includes('minute') || fn.includes('meeting');
+      if (req.id === 'si200') return fn.includes('si-200') || fn.includes('si200') || fn.includes('statement of info');
+      if (req.id === 'cslb_lic') return fn.includes('cslb') || fn.includes('license');
+      if (req.id === 'banking_res') return fn.includes('banking');
+      if (req.id === 'usps_1583') return fn.includes('1583');
+      if (req.id === 'biz_entity') return fn.includes('entity') || fn.includes('acknowledgm');
+      if (req.id === 'statement_inc') return fn.includes('incorporat');
+      return false;
+    });
+  }
+
+  const catGroups = {};
+  REQUIRED_DOCS.forEach(req => {
+    if (!catGroups[req.category]) catGroups[req.category] = [];
+    catGroups[req.category].push(req);
+  });
+
+  let reqHtml = '';
+  const uploadedCount = REQUIRED_DOCS.filter(r => isUploaded(r)).length;
+  reqHtml += `<div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+    <span style="font-size:13px;font-weight:700">${uploadedCount}/${REQUIRED_DOCS.length} documents uploaded</span>
+    <span style="font-size:11px;font-family:var(--mono);color:var(--muted2)">${REQUIRED_DOCS.length - uploadedCount} missing</span>
+  </div>
+  <div style="padding:4px 16px 4px;height:4px;background:var(--border)">
+    <div style="height:4px;background:var(--green);width:${Math.round(uploadedCount/REQUIRED_DOCS.length*100)}%;transition:width .5s;border-radius:2px"></div>
+  </div>`;
+
+  Object.keys(catGroups).forEach(cat => {
+    const color = CAT_COLORS[cat] || 'var(--muted2)';
+    reqHtml += `<div style="font-size:9px;font-family:var(--mono);font-weight:700;color:${color};text-transform:uppercase;letter-spacing:2px;padding:12px 16px 4px;border-top:1px solid var(--border)">${cat}</div>`;
+    catGroups[cat].forEach(req => {
+      const uploaded = isUploaded(req);
+      reqHtml += `
+        <div class="req-row">
+          <div class="req-check ${uploaded ? 'uploaded' : 'missing'}">${uploaded ? '✓' : '?'}</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:${uploaded?'600':'700'};color:${uploaded?'var(--muted2)':'var(--text)'}">${req.label}</div>
+          </div>
+          ${!uploaded ? `<label style="cursor:pointer" title="Upload this file">
+            <input type="file" style="display:none" onchange="handleFileUpload(event)">
+            <span class="btn btn-ghost btn-sm">Upload</span>
+          </label>` : '<span style="font-size:12px;color:var(--green)">✓</span>'}
+        </div>`;
+    });
+  });
+
+  document.getElementById('vaultRequiredList').innerHTML = reqHtml;
+}
+
+// Drag & drop support
+document.addEventListener('DOMContentLoaded', () => {
+  const label = document.getElementById('uploadLabel');
+  if (!label) return;
+  ['dragenter','dragover'].forEach(e => label.addEventListener(e, ev => { ev.preventDefault(); label.classList.add('drag-over'); }));
+  ['dragleave','drop'].forEach(e => label.addEventListener(e, ev => { ev.preventDefault(); label.classList.remove('drag-over'); }));
+  label.addEventListener('drop', ev => {
+    const dt = ev.dataTransfer;
+    if (dt && dt.files.length) {
+      const fakeEvent = { target: { files: dt.files, value:'' } };
+      handleFileUpload(fakeEvent);
+    }
+  });
+});
+
+// ── INIT ──────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
