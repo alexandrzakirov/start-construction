@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#dde0e4">
+<meta name="theme-color" content="#0a0b0d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Start Const.">
@@ -14,27 +14,58 @@
   <link rel="icon" href="/start-construction/icon-192.svg">
 <title>Start Construction, Inc.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 /* ── RESET & BASE ─────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{height:100%;overflow:hidden}
-body{height:100%;overflow:hidden;background:#dde0e4;color:#1a1e24;font-family:'Syne',sans-serif;-webkit-font-smoothing:antialiased}
+body{height:100%;overflow:hidden;background:#0a0b0d;color:#f0f0f0;font-family:'DM Sans',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9998;opacity:0.22}
 
 /* ── VARIABLES ───────────────────────────────────────── */
 :root{
-  --bg:#dde0e4;--surface:#e8eaed;--surface2:#d4d7db;
-  --border:#c2c6cc;--border2:#adb2ba;
-  --accent:#b56e00;--accent-dim:rgba(181,110,0,.13);
-  --green:#166638;--green-dim:rgba(22,102,56,.13);
-  --red:#b52a1c;--red-dim:rgba(181,42,28,.13);
-  --yellow:#7a5500;--yellow-dim:rgba(122,85,0,.13);
-  --blue:#1450a0;--blue-dim:rgba(20,80,160,.13);
-  --text:#1a1e24;--muted:#7a8390;--muted2:#4a5260;
-  --mono:'JetBrains Mono',monospace;
+  /* Linear dark design tokens */
+  --bg-base:#0a0b0d;
+  --bg-elevated:#111318;
+  --bg-overlay:#1a1d24;
+  --bg-input:#161920;
+  --border:rgba(255,255,255,0.06);
+  --border-hover:rgba(255,255,255,0.12);
+  --border-focus:rgba(255,255,255,0.2);
+  --text-primary:#f0f0f0;
+  --text-secondary:#8b8d98;
+  --text-muted:#4a4d5a;
+  --accent:#5e6ad2;
+  --accent-hover:#6872e5;
+  --accent-glow:rgba(94,106,210,0.15);
+  --green:#4ade80;
+  --green-bg:rgba(74,222,128,0.08);
+  --red:#f87171;
+  --red-bg:rgba(248,113,113,0.08);
+  --yellow:#fbbf24;
+  --yellow-bg:rgba(251,191,36,0.08);
+  --blue:#60a5fa;
+  --blue-bg:rgba(96,165,250,0.08);
+  --font-body:'DM Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono','Fira Code',monospace;
   --safe-top:env(safe-area-inset-top,0px);
   --safe-bottom:env(safe-area-inset-bottom,0px);
+
+  /* Legacy aliases so JS-generated HTML keeps working */
+  --bg:var(--bg-base);
+  --surface:var(--bg-elevated);
+  --surface2:var(--bg-overlay);
+  --border2:var(--border-hover);
+  --text:var(--text-primary);
+  --muted:var(--text-secondary);
+  --muted2:var(--text-muted);
+  --green-dim:var(--green-bg);
+  --red-dim:var(--red-bg);
+  --yellow-dim:var(--yellow-bg);
+  --blue-dim:var(--blue-bg);
+  --accent-dim:var(--accent-glow);
+  --mono:var(--font-mono);
 }
 
 /* ── LAYOUT ──────────────────────────────────────────── */
@@ -355,10 +386,195 @@ select option{background:#fff}
 #splash.out{opacity:0;transform:scale(1.04);pointer-events:none}
 .splash-logo-wrap{animation:splashFadeIn .5s .08s cubic-bezier(.4,0,.2,1) both}
 .splash-tagline{
-  font-size:10px;font-family:var(--mono);color:var(--muted2);
+  font-size:10px;font-family:var(--font-mono);color:var(--text-muted);
   letter-spacing:3px;text-transform:uppercase;
   animation:splashFadeIn .4s .32s ease both;
 }
+
+/* ═══════════════════════════════════════════════════
+   LINEAR DARK THEME — COMPONENT OVERRIDES
+   (These cascade over the old light-theme rules above)
+   ═══════════════════════════════════════════════════ */
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-hover);border-radius:2px}
+
+/* ── Header ── */
+.top-header{
+  height:48px;padding:0 16px;
+  background:rgba(10,11,13,0.88);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+}
+.header-logo{
+  width:28px;height:28px;border-radius:6px;
+  background:linear-gradient(135deg,#5e6ad2,#3d4ec4) !important;
+  border:none !important;
+  box-shadow:0 0 0 1px rgba(94,106,210,0.3),0 2px 8px rgba(94,106,210,0.2);
+  font-size:11px;font-weight:700;color:#fff !important;letter-spacing:-0.5px;
+}
+.header-title{font-size:14px;font-weight:600;letter-spacing:-0.3px;color:var(--text-primary)}
+.header-sub{font-size:11px;color:var(--text-muted);font-family:var(--font-mono)}
+.alert-pill{background:var(--red);color:#000;font-family:var(--font-mono)}
+
+/* ── Bottom Nav ── */
+.bottom-nav{
+  background:rgba(10,11,13,0.92);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-top:1px solid var(--border);
+}
+.nav-btn{font-family:var(--font-body);color:var(--text-muted)}
+.nav-btn.active{color:var(--accent)}
+.nav-btn.active .nav-icon{filter:drop-shadow(0 0 5px rgba(94,106,210,0.45))}
+
+/* ── Cards ── */
+.card{background:var(--bg-elevated);border:1px solid var(--border);border-radius:10px}
+.card:hover{border-color:var(--border-hover)}
+.card-head{border-bottom:1px solid var(--border)}
+.card-title{font-size:13px;font-weight:500;color:var(--text-primary);letter-spacing:-0.2px}
+.card-sub{font-family:var(--font-mono);color:var(--text-muted)}
+
+/* ── Stat boxes ── */
+.stat-box{background:var(--bg-elevated);border:1px solid var(--border)}
+.stat-box:hover{border-color:var(--border-hover);transform:translateY(-1px)}
+.stat-label{font-family:var(--font-mono);color:var(--text-muted);font-size:10px}
+.stat-value{font-size:26px;font-weight:600;letter-spacing:-1px}
+.stat-sub{font-family:var(--font-mono);color:var(--text-muted);font-size:11px}
+
+/* ── Progress ── */
+.progress-bar{background:rgba(255,255,255,0.06);height:3px}
+.progress-fill{background:linear-gradient(90deg,var(--accent),var(--accent-hover)) !important;box-shadow:0 0 6px rgba(94,106,210,0.3)}
+
+/* ── Badges ── */
+.badge{font-family:var(--font-mono);font-weight:500;border-radius:4px}
+.badge-ok{background:var(--green-bg);color:var(--green);border-color:rgba(74,222,128,0.15)}
+.badge-warning{background:var(--yellow-bg);color:var(--yellow);border-color:rgba(251,191,36,0.15)}
+.badge-critical{background:var(--red-bg);color:var(--red);border-color:rgba(248,113,113,0.15)}
+.badge-expired{background:var(--red-bg);color:var(--red);border-color:var(--red)}
+.badge-empty{background:rgba(255,255,255,0.04);color:var(--text-muted);border-color:var(--border)}
+.badge-blue{background:var(--blue-bg);color:var(--blue);border-color:rgba(96,165,250,0.15)}
+
+/* ── Alert banners ── */
+.alert-banner.critical{background:var(--red-bg);border-color:rgba(248,113,113,0.2)}
+.alert-banner.warning{background:var(--yellow-bg);border-color:rgba(251,191,36,0.2)}
+.alert-banner.ok{background:var(--green-bg);border-color:rgba(74,222,128,0.2)}
+.alert-text{font-weight:500;letter-spacing:-0.2px}
+.alert-sub{font-family:var(--font-mono);color:var(--text-muted)}
+
+/* ── Rows ── */
+.row{border-bottom:1px solid var(--border)}
+.row:hover{background:var(--bg-overlay)}
+.row-label{font-weight:500;color:var(--text-primary);letter-spacing:-0.2px}
+.row-sub{font-family:var(--font-mono);color:var(--text-muted)}
+
+/* ── Checklist ── */
+.check-row{border-bottom:1px solid var(--border)}
+.check-row:hover{background:var(--bg-overlay)}
+.check-row.done .check-label{text-decoration:line-through}
+.check-box{border:1px solid var(--border-hover);border-radius:4px;background:transparent}
+.check-row.done .check-box{background:var(--green);border-color:var(--green);color:#000;box-shadow:0 0 8px rgba(74,222,128,0.2)}
+.check-label{color:var(--text-primary);font-weight:500;letter-spacing:-0.1px}
+.check-due{font-family:var(--font-mono);color:var(--text-muted);font-size:10px}
+
+/* ── Forms / Inputs ── */
+.field-label{font-family:var(--font-mono);color:var(--text-muted)}
+input[type=text],input[type=number],input[type=date],input[type=time],input[type=email],input[type=tel],input[type=url],select,textarea{
+  background:var(--bg-input) !important;
+  border:1px solid var(--border) !important;
+  border-radius:7px;
+  color:var(--text-primary) !important;
+  font-family:var(--font-mono) !important;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--accent) !important;
+  box-shadow:0 0 0 3px var(--accent-glow) !important;
+}
+input::placeholder{color:var(--text-muted) !important}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a4d5a' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") !important;background-repeat:no-repeat !important;background-position:right 12px center !important}
+select option{background:var(--bg-elevated)}
+
+/* ── Buttons ── */
+.btn{font-family:var(--font-body);font-weight:500;letter-spacing:-0.1px;border-radius:7px}
+.btn-primary{background:var(--accent) !important;color:#fff !important;border:none !important;box-shadow:0 0 0 1px rgba(94,106,210,0.5),0 2px 8px rgba(94,106,210,0.2)}
+.btn-primary:hover{background:var(--accent-hover) !important}
+.btn-ghost{background:rgba(255,255,255,0.05) !important;color:var(--text-secondary) !important;border:1px solid var(--border) !important}
+.btn-ghost:hover{background:rgba(255,255,255,0.08) !important;border-color:var(--border-hover) !important;color:var(--text-primary) !important}
+.btn-danger{background:var(--red-bg) !important;color:var(--red) !important;border:1px solid rgba(248,113,113,0.15) !important}
+.btn-danger:hover{border-color:var(--red) !important}
+
+/* ── Section head ── */
+.section-head{font-family:var(--font-mono);color:var(--text-muted);letter-spacing:1.5px;font-weight:500;font-size:10px}
+
+/* ── Page hero ── */
+.page-hero{border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--bg-overlay) 0%,transparent 100%)}
+.page-tag{font-family:var(--font-mono);color:var(--accent);letter-spacing:2px;opacity:0.8}
+.page-title{font-size:22px;font-weight:600;letter-spacing:-0.8px;color:var(--text-primary)}
+
+/* ── Quick links ── */
+.link-tile{background:var(--bg-elevated) !important;border:1px solid var(--border);color:var(--text-primary)}
+.link-tile:hover{border-color:var(--border-hover);box-shadow:0 6px 20px rgba(0,0,0,.3)}
+.link-url{font-family:var(--font-mono);color:var(--text-muted)}
+.link-label{font-weight:500;letter-spacing:-0.1px}
+
+/* ── Distributions ── */
+.dist-row{border-bottom:1px solid var(--border)}
+.dist-amount{color:var(--green);font-family:var(--font-mono)}
+.dist-date{font-family:var(--font-mono);color:var(--text-muted)}
+
+/* ── Modal ── */
+.modal-overlay{background:rgba(0,0,0,.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.modal-sheet{background:var(--bg-elevated) !important;border:1px solid var(--border);border-radius:16px 16px 0 0;border-bottom:none}
+.modal-handle{background:var(--border-hover)}
+.modal-head{border-bottom:1px solid var(--border)}
+.modal-title{font-size:16px;font-weight:600;letter-spacing:-0.4px;color:var(--text-primary)}
+
+/* ── Toast ── */
+.toast{
+  background:var(--bg-elevated) !important;color:var(--text-primary) !important;
+  border:1px solid var(--border-hover);font-family:var(--font-mono);
+  box-shadow:0 4px 24px rgba(0,0,0,.5);backdrop-filter:blur(8px);border-radius:20px;
+}
+
+/* ── Vendor cards ── */
+.vendor-card{background:var(--bg-elevated) !important;border:1px solid var(--border)}
+.vendor-card:hover{border-color:var(--border-hover)}
+.vendor-head:hover{background:var(--bg-overlay)}
+.vendor-body{background:transparent}
+.vendor-field{border-bottom:1px solid var(--border)}
+.vendor-field-label{font-family:var(--font-mono);color:var(--text-muted)}
+.vendor-field-value{font-family:var(--font-mono);color:var(--text-secondary)}
+.vendor-name{letter-spacing:-0.2px;color:var(--text-primary)}
+.vendor-account{font-family:var(--font-mono);color:var(--text-muted)}
+.vs-active{background:var(--green-bg);color:var(--green);border:1px solid rgba(74,222,128,0.15)}
+.vs-pending{background:var(--yellow-bg);color:var(--yellow);border:1px solid rgba(251,191,36,0.15)}
+.vs-needed{background:var(--red-bg);color:var(--red);border:1px solid rgba(248,113,113,0.15)}
+
+/* ── Vault / Files ── */
+.file-row:hover{background:var(--bg-overlay)}
+.file-name{letter-spacing:-0.1px;color:var(--text-primary)}
+.file-meta{font-family:var(--font-mono);color:var(--text-muted)}
+.req-row:hover{background:var(--bg-overlay)}
+.req-check.uploaded{background:var(--green-bg);color:var(--green)}
+.req-check.missing{background:rgba(255,255,255,0.04);color:var(--text-muted)}
+.filter-btn{background:transparent;border:1px solid var(--border);color:var(--text-muted);font-family:var(--font-mono)}
+.filter-btn.active{background:var(--accent-glow);color:var(--accent);border-color:rgba(94,106,210,0.3)}
+.empty-vault{color:var(--text-muted);font-family:var(--font-mono)}
+
+/* ── Upload drop zone ── */
+#uploadDropZone{background:var(--bg-elevated) !important;border-color:var(--border-hover) !important}
+#uploadDropZone span:first-of-type{color:var(--text-primary) !important}
+
+/* ── Splash ── */
+#splash{background:#0a0b0d !important}
+
+/* ── Ripple ── */
+.ripple-wave{background:rgba(255,255,255,.12) !important}
+
+/* ── gdriveAddModal white panel ── */
+#gdriveAddModal > div{background:var(--bg-elevated) !important;border:1px solid var(--border);border-radius:12px}
+#gdriveAddModal label{color:var(--text-primary)}
 </style>
 </head>
 <body>
@@ -368,21 +584,21 @@ select option{background:#fff}
   <div class="splash-logo-wrap">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 180" width="240" height="144">
       <!-- Outer roof -->
-      <path d="M15,95 L150,10 L285,95" stroke="#1a1e24" stroke-width="6.5" fill="none" stroke-linecap="round" stroke-linejoin="miter"/>
-      <!-- White fill between lines -->
-      <path d="M15,95 L150,10 L285,95 L270,95 L150,26 L30,95 Z" fill="#e8eaed"/>
+      <path d="M15,95 L150,10 L285,95" stroke="#f0f0f0" stroke-width="6.5" fill="none" stroke-linecap="round" stroke-linejoin="miter"/>
+      <!-- Dark fill between lines -->
+      <path d="M15,95 L150,10 L285,95 L270,95 L150,26 L30,95 Z" fill="#0a0b0d"/>
       <!-- Inner roof -->
-      <path d="M30,95 L150,26 L270,95" stroke="#1a1e24" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="miter"/>
+      <path d="M30,95 L150,26 L270,95" stroke="#f0f0f0" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="miter"/>
       <!-- START -->
       <text x="150" y="143" text-anchor="middle"
             font-family="'Arial Black','Franklin Gothic Heavy','Impact',Arial,sans-serif"
             font-size="72" font-weight="900" font-style="italic"
-            fill="#1a1e24" letter-spacing="-1">START</text>
+            fill="#f0f0f0" letter-spacing="-1">START</text>
       <!-- CONSTRUCTION -->
       <text x="150" y="168" text-anchor="middle"
             font-family="'Arial Black','Franklin Gothic Heavy','Impact',Arial,sans-serif"
             font-size="25" font-weight="900"
-            fill="#1a1e24" letter-spacing="3">CONSTRUCTION</text>
+            fill="#f0f0f0" letter-spacing="3">CONSTRUCTION</text>
     </svg>
   </div>
   <div class="splash-tagline">CSLB #1123785 · California S-Corp</div>
@@ -394,13 +610,7 @@ select option{background:#fff}
   <!-- TOP HEADER -->
   <div class="top-header">
     <div class="header-left">
-      <div class="header-logo" style="background:none;border:none;width:38px;height:38px;padding:0">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38 38" width="38" height="38">
-          <path d="M4,26 L19,6 L34,26" stroke="#b56e00" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="miter"/>
-          <path d="M4,26 L19,6 L34,26 L31,26 L19,10 L7,26 Z" fill="#e8eaed"/>
-          <path d="M7,26 L19,10 L31,26" stroke="#b56e00" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="miter"/>
-        </svg>
-      </div>
+      <div class="header-logo">SC</div>
       <div>
         <div class="header-title">Start Construction</div>
         <div class="header-sub">CSLB #1123785 · S-Corp</div>
@@ -415,6 +625,7 @@ select option{background:#fff}
 
     <!-- DASHBOARD PAGE -->
     <div class="page active" id="page-dashboard">
+      <div id="dashGreeting"></div>
       <div id="dashAlerts"></div>
 
       <div class="stat-row">
@@ -933,6 +1144,197 @@ select option{background:#fff}
 <!-- TOAST -->
 <div class="toast" id="toast">✓ Saved</div>
 
+<!-- ══════════════════════════════════════════════════════
+     TASK FORM MODALS
+     ══════════════════════════════════════════════════════ -->
+
+<!-- 1. Annual Meeting Minutes -->
+<div class="modal-overlay" id="taskModal_annual_minutes">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <div class="modal-title">🏛 Annual Meeting Minutes</div>
+      <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);margin-top:3px">Due: January 31 each year</div>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label class="field-label">Meeting Date</label><input type="date" id="am_date"></div>
+      <div class="field"><label class="field-label">Meeting Time</label><input type="time" id="am_time" value="10:00"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="field"><label class="field-label">Total Revenue 2025 ($)</label><input type="number" id="am_revenue" placeholder="0.00"></div>
+        <div class="field"><label class="field-label">Total Expenses 2025 ($)</label><input type="number" id="am_expenses" placeholder="0.00"></div>
+      </div>
+      <div class="field"><label class="field-label">Annual Salary 2026 ($)</label><input type="number" id="am_salary" placeholder="From Settings"></div>
+      <div class="field"><label class="field-label">Business Plans 2026</label><textarea id="am_plans" rows="3" placeholder="Projects, goals, new contracts, hiring plans..."></textarea></div>
+      <button class="btn btn-primary btn-full" onclick="downloadAnnualMinutes()">📄 Download PDF</button>
+      <button class="btn btn-ghost btn-full" onclick="markTaskDone('annual_minutes');closeModal('taskModal_annual_minutes')">✓ Mark Done (no PDF)</button>
+      <button class="btn btn-ghost btn-full" onclick="closeModal('taskModal_annual_minutes')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- 2. W-2 Checklist -->
+<div class="modal-overlay" id="taskModal_w2_sent">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <div class="modal-title">📄 W-2 Sent to Self via Gusto</div>
+      <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);margin-top:3px">Due: January 31</div>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label class="field-label">Tax Year</label><input type="text" id="w2_year" value="2025"></div>
+      <div class="field"><label class="field-label">W-2 Send Date</label><input type="date" id="w2_send_date"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="field"><label class="field-label">Box 1 - Wages ($)</label><input type="number" id="w2_box1" placeholder="0.00"></div>
+        <div class="field"><label class="field-label">Box 2 - Fed Tax Withheld ($)</label><input type="number" id="w2_box2" placeholder="0.00"></div>
+        <div class="field"><label class="field-label">Box 3 - SS Wages ($)</label><input type="number" id="w2_box3" placeholder="0.00"></div>
+        <div class="field"><label class="field-label">Box 4 - SS Tax ($)</label><input type="number" id="w2_box4" placeholder="0.00"></div>
+        <div class="field"><label class="field-label">Box 5 - Medicare Wages ($)</label><input type="number" id="w2_box5" placeholder="0.00"></div>
+        <div class="field"><label class="field-label">Box 6 - Medicare Tax ($)</label><input type="number" id="w2_box6" placeholder="0.00"></div>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="downloadW2PDF()">📄 Download PDF</button>
+      <button class="btn btn-ghost btn-full" onclick="markTaskDone('w2_self');closeModal('taskModal_w2_sent')">✓ Mark Done (no PDF)</button>
+      <button class="btn btn-ghost btn-full" onclick="closeModal('taskModal_w2_sent')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- 3. 1099-NEC -->
+<div class="modal-overlay" id="taskModal_1099_sent">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <div class="modal-title">📋 1099-NEC to Subcontractors</div>
+      <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);margin-top:3px">Due: January 31</div>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label class="field-label">Tax Year</label><input type="text" id="nec_year" value="2025"></div>
+      <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);margin-bottom:8px">Add all subcontractors paid $600+ during the year:</div>
+      <div id="contractors1099List"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <button class="btn btn-ghost btn-sm" onclick="addContractor()">+ Add Contractor</button>
+        <div style="font-size:12px;font-family:var(--font-mono);color:var(--text-muted)">Total: <strong id="contractors1099Total" style="color:var(--text-primary)">$0.00</strong></div>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="renderContractors1099();download1099PDF()">📄 Download PDF</button>
+      <button class="btn btn-ghost btn-full" onclick="markTaskDone('_1099_subs');closeModal('taskModal_1099_sent')">✓ Mark Done (no PDF)</button>
+      <button class="btn btn-ghost btn-full" onclick="closeModal('taskModal_1099_sent')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- 4. Form 1120-S -->
+<div class="modal-overlay" id="taskModal_1120s_filed">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <div class="modal-title">🏦 Form 1120-S Filed (Federal)</div>
+      <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);margin-top:3px">Due: March 15</div>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label class="field-label">Tax Year</label><input type="text" id="s1120_year" value="2025"></div>
+      <div class="field"><label class="field-label">Filed Date</label><input type="date" id="s1120_filed_date"></div>
+      <div class="field"><label class="field-label">Filing Method</label>
+        <select id="s1120_method"><option>E-file</option><option>Mail</option></select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="field"><label class="field-label">Total Income ($)</label><input type="number" id="s1120_income" placeholder="0.00"></div>
+        <div class="field"><label class="field-label">Total Deductions ($)</label><input type="number" id="s1120_deductions" placeholder="0.00"></div>
+      </div>
+      <div class="field"><label class="field-label">Extension Filed?</label>
+        <select id="s1120_extension"><option>No</option><option>Yes - Form 7004</option></select>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="download1120SPDF()">📄 Download PDF</button>
+      <button class="btn btn-ghost btn-full" onclick="markTaskDone('_1120s');closeModal('taskModal_1120s_filed')">✓ Mark Done (no PDF)</button>
+      <button class="btn btn-ghost btn-full" onclick="closeModal('taskModal_1120s_filed')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- 5. CA Form 100S -->
+<div class="modal-overlay" id="taskModal_100s_filed">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <div class="modal-title">🏦 CA Form 100S Filed</div>
+      <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);margin-top:3px">Due: March 15</div>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label class="field-label">Tax Year</label><input type="text" id="ca100_year" value="2025"></div>
+      <div class="field"><label class="field-label">Filed Date</label><input type="date" id="ca100_filed_date"></div>
+      <div class="field"><label class="field-label">CA Confirmation Number</label><input type="text" id="ca100_conf" placeholder="FTB confirmation #"></div>
+      <div style="padding:10px;background:var(--accent-glow);border:1px solid rgba(94,106,210,0.2);border-radius:8px;font-size:11px;font-family:var(--font-mono);color:var(--text-secondary);margin-bottom:12px">
+        CA Entity: 6117165  ·  Min $800 Franchise Tax due
+      </div>
+      <button class="btn btn-primary btn-full" onclick="downloadCA100SPDF()">📄 Download PDF</button>
+      <button class="btn btn-ghost btn-full" onclick="markTaskDone('ca_100s');closeModal('taskModal_100s_filed')">✓ Mark Done (no PDF)</button>
+      <button class="btn btn-ghost btn-full" onclick="closeModal('taskModal_100s_filed')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- 6. SI-200 Statement of Information -->
+<div class="modal-overlay" id="taskModal_si200_filed">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <div class="modal-title">🏛 Statement of Information SI-200</div>
+      <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);margin-top:3px">Due: February annually  ·  $25 fee</div>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label class="field-label">Filing Year</label><input type="text" id="si200_year" value="2026"></div>
+      <div class="field"><label class="field-label">Filed Date</label><input type="date" id="si200_filed_date"></div>
+      <div class="field"><label class="field-label">CA SOS Confirmation Number</label><input type="text" id="si200_conf" placeholder="Confirmation #"></div>
+      <div style="padding:10px;background:var(--bg-overlay);border:1px solid var(--border);border-radius:8px;font-size:11px;font-family:var(--font-mono);color:var(--text-muted);margin-bottom:12px;line-height:1.8">
+        Start Construction, Inc.  ·  Entity: 6117165<br>
+        2800 Walnut Ave, Apt 43, Carmichael CA 95608<br>
+        Officer: Aleksandr Zakirov (all roles)
+      </div>
+      <a href="https://bizfileonline.sos.ca.gov" target="_blank" class="btn btn-ghost btn-full" style="text-decoration:none;margin-bottom:10px">🏛 File at bizfileonline.sos.ca.gov</a>
+      <button class="btn btn-primary btn-full" onclick="downloadSI200PDF()">📄 Download Filing Record PDF</button>
+      <button class="btn btn-ghost btn-full" onclick="markTaskDone('si200');closeModal('taskModal_si200_filed')">✓ Mark Done (no PDF)</button>
+      <button class="btn btn-ghost btn-full" onclick="closeModal('taskModal_si200_filed')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- 7. Insurance Renewal -->
+<div class="modal-overlay" id="taskModal_insurance_renewed">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <div class="modal-title">🛡 Insurance Policies Renewed</div>
+      <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);margin-top:3px">Workers Comp expires Oct 03, 2026</div>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label class="field-label">Policy Type</label>
+        <select id="ins_type">
+          <option>Workers Compensation</option>
+          <option>General Liability</option>
+          <option>Commercial Auto</option>
+          <option>Contractor's Bond</option>
+          <option>Umbrella Policy</option>
+        </select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="field"><label class="field-label">Current Policy #</label><input type="text" id="ins_old_policy" value="CWC03618700"></div>
+        <div class="field"><label class="field-label">Current Expiry</label><input type="date" id="ins_old_expiry" value="2026-10-03"></div>
+      </div>
+      <div class="field"><label class="field-label">New Policy #</label><input type="text" id="ins_new_policy" placeholder="New policy number"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="field"><label class="field-label">New Effective Date</label><input type="date" id="ins_new_start"></div>
+        <div class="field"><label class="field-label">New Expiry Date</label><input type="date" id="ins_new_expiry"></div>
+      </div>
+      <div class="field"><label class="field-label">Annual Premium ($)</label><input type="number" id="ins_premium" placeholder="0.00"></div>
+      <div class="field"><label class="field-label">Notes</label><textarea id="ins_notes" rows="2" placeholder="Coverage changes, additional insured, etc."></textarea></div>
+      <div style="padding:10px;background:var(--bg-overlay);border:1px solid var(--border);border-radius:8px;font-size:11px;font-family:var(--font-mono);color:var(--text-muted);margin-bottom:12px;line-height:1.8">
+        Agent: Mark Florea  ·  Pro-Builders Insurance<br>
+        (916) 964-0717  ·  mark@insureprobuilders.com
+      </div>
+      <button class="btn btn-primary btn-full" onclick="downloadInsurancePDF()">📄 Download PDF</button>
+      <button class="btn btn-ghost btn-full" onclick="markTaskDone('insurance_renew');closeModal('taskModal_insurance_renewed')">✓ Mark Done (no PDF)</button>
+      <button class="btn btn-ghost btn-full" onclick="closeModal('taskModal_insurance_renewed')">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <script>
 
@@ -1124,6 +1526,20 @@ function renderHeader(alerts) {
 function renderDashboard(alerts) {
   const dashAlerts = document.getElementById('dashAlerts');
   if (!dashAlerts) return;
+
+  // Greeting
+  const greetingEl = document.getElementById('dashGreeting');
+  if (greetingEl) {
+    const h = new Date().getHours();
+    const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+    const dateStr = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+    greetingEl.innerHTML = `
+      <div style="padding:20px 16px 8px">
+        <div style="font-size:22px;font-weight:600;letter-spacing:-0.8px;color:var(--text-primary)">${g}, Aleksandr</div>
+        <div style="font-size:12px;color:var(--text-muted);font-family:var(--font-mono);margin-top:3px">${dateStr}</div>
+      </div>`;
+  }
+
   if (alerts.length === 0) {
     dashAlerts.innerHTML = `<div class="alert-banner ok" style="margin-top:14px"><div class="alert-icon">✅</div><div><div class="alert-text" style="color:var(--green)">All compliance items current</div><div class="alert-sub">No expirations within 60 days</div></div></div>`;
   } else {
@@ -1380,6 +1796,9 @@ function renderChecklist() {
     { title:'Q4 Tasks', items: CHECKLIST.filter(i => i.q === 4) },
   ];
 
+  // Tasks that have a form modal
+  const FORM_TASKS = new Set(['annual_minutes','w2_self','_1099_subs','_1120s','ca_100s','si200','insurance_renew']);
+
   document.getElementById('checklistContent').innerHTML = groups.map(g => {
     const gdone = g.items.filter(i => D.checklist[i.id + '_' + YEAR]).length;
     return `
@@ -1387,12 +1806,16 @@ function renderChecklist() {
       <div class="card">
         ${g.items.map(item => {
           const checked = !!D.checklist[item.id + '_' + YEAR];
-          return `<div class="check-row ${checked ? 'done' : ''}" onclick="toggleCheck('${item.id}','${YEAR}')">
-            <div class="check-box">${checked ? '✓' : ''}</div>
-            <div class="check-text">
-              <div class="check-label">${item.label}</div>
-              <div class="check-due">Due: ${item.due}</div>
+          const hasForm = FORM_TASKS.has(item.id);
+          return `<div class="check-row ${checked ? 'done' : ''}" style="padding:0;gap:0">
+            <div style="display:flex;align-items:flex-start;gap:12px;flex:1;padding:12px 12px 12px 16px;cursor:pointer" onclick="toggleCheck('${item.id}','${YEAR}')">
+              <div class="check-box" style="flex-shrink:0;margin-top:1px">${checked ? '✓' : ''}</div>
+              <div class="check-text">
+                <div class="check-label">${item.label}</div>
+                <div class="check-due">Due: ${item.due}</div>
+              </div>
             </div>
+            ${hasForm ? `<button class="btn btn-ghost btn-sm" style="margin:auto 12px auto 0;flex-shrink:0;font-size:10px;padding:4px 8px;letter-spacing:0" onclick="event.stopPropagation();openTaskModal('${item.id}')">📝 Fill</button>` : ''}
           </div>`;
         }).join('')}
       </div>`;
@@ -2722,6 +3145,458 @@ function initVaultUpload() {
   });
 }
 
+// ── TASK FORM HELPERS ─────────────────────────────────────────────
+function loadSettings() { return D.settings; }
+
+function markTaskDone(id) {
+  const key = id + '_2025';
+  D.checklist[key] = true;
+  save();
+  renderChecklist();
+}
+
+// Maps checklist IDs to modal IDs
+const TASK_MODAL_MAP = {
+  'annual_minutes': 'taskModal_annual_minutes',
+  'w2_self':        'taskModal_w2_sent',
+  '_1099_subs':     'taskModal_1099_sent',
+  '_1120s':         'taskModal_1120s_filed',
+  'ca_100s':        'taskModal_100s_filed',
+  'si200':          'taskModal_si200_filed',
+  'insurance_renew':'taskModal_insurance_renewed',
+};
+
+function openTaskModal(taskId) {
+  const modalId = TASK_MODAL_MAP[taskId];
+  if (!modalId) return showToast('Form not yet available');
+  openModal(modalId);
+}
+
+// Contractor list state for 1099 form
+let contractors1099 = [{ name:'', ein:'', amount:'' }];
+
+function addContractor() {
+  contractors1099.push({ name:'', ein:'', amount:'' });
+  renderContractors1099();
+}
+
+function renderContractors1099() {
+  const div = document.getElementById('contractors1099List');
+  if (!div) return;
+  let total = 0;
+  div.innerHTML = contractors1099.map((c, i) => {
+    const amt = parseFloat(c.amount) || 0;
+    total += amt;
+    return `<div style="display:flex;gap:6px;margin-bottom:6px;align-items:center">
+      <input type="text" placeholder="Name / Company" value="${c.name}" oninput="contractors1099[${i}].name=this.value" style="flex:2;font-size:12px">
+      <input type="text" placeholder="EIN / SSN" value="${c.ein}" oninput="contractors1099[${i}].ein=this.value" style="flex:1;font-size:12px">
+      <input type="number" placeholder="Amount $" value="${c.amount}" oninput="contractors1099[${i}].amount=this.value" style="flex:1;font-size:12px">
+      <button class="btn btn-danger btn-sm" onclick="contractors1099.splice(${i},1);renderContractors1099()" style="padding:5px 8px">✕</button>
+    </div>`;
+  }).join('');
+  const tot = document.getElementById('contractors1099Total');
+  if (tot) tot.textContent = '$' + total.toLocaleString('en-US',{minimumFractionDigits:2});
+}
+
+// ── PDF HELPERS ────────────────────────────────────────────────────
+function createPDFBase(title, subtitle) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'mm', format:'letter' });
+  const W = doc.internal.pageSize.getWidth();
+  const H = doc.internal.pageSize.getHeight();
+  const M = 20;
+  let y = 6;
+
+  // Accent top bar
+  doc.setFillColor(94,106,210); doc.rect(0,0,W,6,'F');
+
+  y = 16;
+  doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(15,15,20);
+  doc.text('START CONSTRUCTION, INC.', M, y);
+  y += 5;
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(110,110,120);
+  doc.text('California S-Corp  ·  EIN: 99-1788037  ·  CSLB #1123785  ·  2800 Walnut Ave Apt 43, Carmichael CA 95608', M, y);
+  y += 4;
+  doc.setDrawColor(94,106,210); doc.setLineWidth(0.4); doc.line(M,y,W-M,y);
+  y += 10;
+  doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(15,15,20);
+  doc.text(title.toUpperCase(), M, y);
+  if (subtitle) {
+    y += 6; doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(110,110,120);
+    doc.text(subtitle, M, y);
+  }
+  y += 8;
+  doc.setDrawColor(220,220,225); doc.setLineWidth(0.2); doc.line(M,y,W-M,y);
+  return { doc, W, H, M, y: y+6 };
+}
+
+function addPDFSection(doc, W, M, y, title) {
+  doc.setFillColor(240,241,255); doc.rect(M, y-3, W-M*2, 8, 'F');
+  doc.setDrawColor(94,106,210); doc.setLineWidth(2.5); doc.line(M, y-3, M, y+5); doc.setLineWidth(0.2);
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(94,106,210);
+  doc.text(title, M+5, y+2);
+  return y+12;
+}
+
+function addPDFRow(doc, W, M, y, label, value, bold) {
+  if (y > doc.internal.pageSize.getHeight() - 30) { doc.addPage(); y = 25; }
+  doc.setFont('helvetica', bold ? 'bold' : 'normal'); doc.setFontSize(9);
+  doc.setTextColor(80,80,90); doc.text(label + ':', M, y);
+  doc.setTextColor(bold ? 15 : 30, bold ? 15 : 30, bold ? 20 : 35);
+  doc.text(String(value || '—'), M+55, y);
+  return y+6;
+}
+
+function addPDFResolved(doc, W, M, y, text) {
+  if (y > doc.internal.pageSize.getHeight() - 35) { doc.addPage(); y = 25; }
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(94,106,210);
+  doc.text('RESOLVED:', M, y);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(30,30,35);
+  const lines = doc.splitTextToSize(text, W-M*2-22);
+  doc.text(lines, M+22, y);
+  return y + lines.length * 4.5 + 5;
+}
+
+function addPDFSignature(doc, W, H, M) {
+  const y = H - 35;
+  doc.setDrawColor(180,180,190); doc.setLineWidth(0.3);
+  doc.line(M+3, y+8, M+70, y+8);
+  doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.setTextColor(30,30,35);
+  doc.text('Aleksandr Zakirov', M+3, y+14);
+  doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(110,110,120);
+  doc.text('Director, President, Secretary & Treasurer', M+3, y+19);
+  doc.line(W-M-40, y+8, W-M, y+8);
+  doc.text('Date', W-M-40, y+4);
+}
+
+function addPDFFooter(doc, W, H, M, pageNum, totalPages) {
+  doc.setFillColor(248,248,252); doc.rect(0, H-10, W, 10, 'F');
+  doc.setDrawColor(220,220,225); doc.setLineWidth(0.2); doc.line(0, H-10, W, H-10);
+  doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(140,140,150);
+  doc.text('Start Construction, Inc.  ·  CSLB #1123785  ·  EIN: 99-1788037', M, H-4);
+  doc.text(`Page ${pageNum} of ${totalPages}`, W-M, H-4, { align:'right' });
+  doc.setFillColor(94,106,210); doc.rect(0, 0, W, 2, 'F');
+}
+
+function finalizePDF(doc, W, H, M, filename) {
+  const pages = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= pages; i++) { doc.setPage(i); addPDFFooter(doc, W, H, M, i, pages); }
+  doc.save(filename);
+  showToast('PDF saved: ' + filename);
+}
+
+// ── PDF: ANNUAL MEETING MINUTES ───────────────────────────────────
+function downloadAnnualMinutes() {
+  const s = loadSettings();
+  const data = {
+    date: document.getElementById('am_date')?.value || new Date().toISOString().slice(0,10),
+    time: document.getElementById('am_time')?.value || '10:00',
+    revenue: parseFloat(document.getElementById('am_revenue')?.value) || 0,
+    expenses: parseFloat(document.getElementById('am_expenses')?.value) || 0,
+    salary: parseFloat(document.getElementById('am_salary')?.value) || parseFloat(s.salary) || 0,
+    plans: document.getElementById('am_plans')?.value || '',
+  };
+  const net = data.revenue - data.expenses;
+  const fmt = n => '$' + n.toLocaleString('en-US',{minimumFractionDigits:2});
+  const year = new Date(data.date + 'T12:00:00').getFullYear();
+  const dateStr = new Date(data.date + 'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+
+  let {doc,W,H,M,y} = createPDFBase('Annual Meeting Minutes','Board of Directors  ·  Start Construction, Inc.');
+
+  y = addPDFSection(doc,W,M,y,'MEETING INFORMATION');
+  y = addPDFRow(doc,W,M,y,'Date',dateStr);
+  y = addPDFRow(doc,W,M,y,'Time',data.time);
+  y = addPDFRow(doc,W,M,y,'Location','2800 Walnut Ave, Apt 43, Carmichael, CA 95608');
+  y = addPDFRow(doc,W,M,y,'Director Present','Aleksandr Zakirov - Director, President, Secretary, Treasurer');
+  y += 4;
+
+  y = addPDFSection(doc,W,M,y,`ITEM 1 - FINANCIAL REVIEW ${year-1}`);
+  y = addPDFRow(doc,W,M,y,'Total Revenue',fmt(data.revenue));
+  y = addPDFRow(doc,W,M,y,'Total Expenses',fmt(data.expenses));
+  y = addPDFRow(doc,W,M,y,'Net Income',fmt(net),true);
+  y += 2;
+  y = addPDFResolved(doc,W,M,y,`The financial results for ${year-1} are hereby reviewed and approved by the Board.`);
+
+  y = addPDFSection(doc,W,M,y,`ITEM 2 - OFFICER ELECTIONS FOR ${year}`);
+  [['President & CEO','Aleksandr Zakirov'],['CFO','Aleksandr Zakirov'],['Secretary','Aleksandr Zakirov'],['Treasurer','Aleksandr Zakirov']].forEach(([r,v]) => { y = addPDFRow(doc,W,M,y,r,v); });
+  y = addPDFResolved(doc,W,M,y,`The above officers are elected for fiscal year ${year}.`);
+
+  y = addPDFSection(doc,W,M,y,`ITEM 3 - ANNUAL SALARY ${year}`);
+  y = addPDFResolved(doc,W,M,y,`Annual W-2 salary for Aleksandr Zakirov is set at ${fmt(data.salary)} for ${year}, payable through Gusto payroll, for services as President, General Contractor, and primary operator.`);
+
+  y = addPDFSection(doc,W,M,y,'ITEM 4 - DISTRIBUTIONS POLICY');
+  y = addPDFResolved(doc,W,M,y,'The corporation may make quarterly shareholder distributions from net profits. Each distribution shall be accompanied by a written Board Resolution prior to payment. The shareholder shall set aside approximately 30% of each distribution for estimated tax payments.');
+
+  if (data.plans.trim()) {
+    if (y > H-70) { doc.addPage(); y = 25; }
+    y = addPDFSection(doc,W,M,y,`ITEM 5 - BUSINESS PLANS ${year}`);
+    const pl = doc.splitTextToSize(data.plans, W-M*2);
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(30,30,35);
+    doc.text(pl, M, y); y += pl.length * 4.5 + 8;
+  }
+
+  if (y > H-70) { doc.addPage(); y = 25; }
+  y = addPDFSection(doc,W,M,y,'ITEM 6 - CSLB & COMPLIANCE');
+  y = addPDFResolved(doc,W,M,y,'The corporation shall maintain CSLB License #1123785 in good standing, including timely renewal of Workers Compensation (CWC03618700), General Liability, and all required policies.');
+  y = addPDFResolved(doc,W,M,y,'Aleksandr Zakirov holds EPA 608 Universal Certification (#OiNXMYM1DG) required for HVAC refrigerant handling.');
+
+  y += 6;
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(15,15,20);
+  doc.text('ADJOURNMENT', M, y);
+  y += 5;
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(60,60,70);
+  doc.text('There being no further business, the meeting was adjourned.', M, y);
+
+  addPDFSignature(doc,W,H,M);
+  finalizePDF(doc,W,H,M,`Annual_Meeting_Minutes_${year}.pdf`);
+  markTaskDone('annual_minutes');
+  closeModal('taskModal_annual_minutes');
+}
+
+// ── PDF: W-2 CHECKLIST ────────────────────────────────────────────
+function downloadW2PDF() {
+  const year = document.getElementById('w2_year')?.value || '2025';
+  const sendDate = document.getElementById('w2_send_date')?.value || '';
+  const wages = parseFloat(document.getElementById('w2_box1')?.value) || 0;
+  const fedTax = parseFloat(document.getElementById('w2_box2')?.value) || 0;
+  const ssWages = parseFloat(document.getElementById('w2_box3')?.value) || 0;
+  const ssTax = parseFloat(document.getElementById('w2_box4')?.value) || 0;
+  const medWages = parseFloat(document.getElementById('w2_box5')?.value) || 0;
+  const medTax = parseFloat(document.getElementById('w2_box6')?.value) || 0;
+  const fmt = n => '$' + n.toLocaleString('en-US',{minimumFractionDigits:2});
+  const s = loadSettings();
+
+  let {doc,W,H,M,y} = createPDFBase(`W-2 Checklist ${year}`,`Tax Year ${year}  ·  Start Construction, Inc.`);
+
+  y = addPDFSection(doc,W,M,y,'EMPLOYER INFORMATION');
+  y = addPDFRow(doc,W,M,y,'Company','Start Construction, Inc.');
+  y = addPDFRow(doc,W,M,y,'EIN',s.ein || '99-1788037');
+  y = addPDFRow(doc,W,M,y,'Address',s.address || '2800 Walnut Ave, Apt 43, Carmichael CA 95608');
+  y = addPDFRow(doc,W,M,y,'Payroll Provider','Gusto');
+  y += 4;
+
+  y = addPDFSection(doc,W,M,y,'EMPLOYEE - W-2 DETAILS');
+  y = addPDFRow(doc,W,M,y,'Employee','Aleksandr Zakirov');
+  y = addPDFRow(doc,W,M,y,'Tax Year',year);
+  if (sendDate) y = addPDFRow(doc,W,M,y,'Sent Date',new Date(sendDate+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}));
+  y += 4;
+
+  y = addPDFSection(doc,W,M,y,'WAGE AND TAX SUMMARY');
+  y = addPDFRow(doc,W,M,y,'Box 1 - Wages, Tips',fmt(wages),true);
+  y = addPDFRow(doc,W,M,y,'Box 2 - Fed Tax Withheld',fmt(fedTax));
+  y = addPDFRow(doc,W,M,y,'Box 3 - SS Wages',fmt(ssWages));
+  y = addPDFRow(doc,W,M,y,'Box 4 - SS Tax Withheld',fmt(ssTax));
+  y = addPDFRow(doc,W,M,y,'Box 5 - Medicare Wages',fmt(medWages));
+  y = addPDFRow(doc,W,M,y,'Box 6 - Medicare Tax',fmt(medTax));
+  y += 6;
+
+  y = addPDFSection(doc,W,M,y,'CONFIRMATION');
+  y = addPDFResolved(doc,W,M,y,`W-2 for tax year ${year} has been issued to Aleksandr Zakirov via Gusto. All payroll taxes have been withheld and remitted as required by IRS and CA FTB.`);
+
+  addPDFSignature(doc,W,H,M);
+  finalizePDF(doc,W,H,M,`W2_Checklist_${year}.pdf`);
+  markTaskDone('w2_self');
+  closeModal('taskModal_w2_sent');
+}
+
+// ── PDF: 1099-NEC ─────────────────────────────────────────────────
+function download1099PDF() {
+  const year = document.getElementById('nec_year')?.value || '2025';
+  const fmt = n => '$' + n.toLocaleString('en-US',{minimumFractionDigits:2});
+  const total = contractors1099.reduce((s,c) => s + (parseFloat(c.amount)||0), 0);
+
+  let {doc,W,H,M,y} = createPDFBase(`1099-NEC Log ${year}`,`Tax Year ${year}  ·  Subcontractor Payments`);
+
+  y = addPDFSection(doc,W,M,y,'PAYER INFORMATION');
+  y = addPDFRow(doc,W,M,y,'Company','Start Construction, Inc.');
+  y = addPDFRow(doc,W,M,y,'EIN','99-1788037');
+  y = addPDFRow(doc,W,M,y,'Filing Deadline','January 31, ' + (parseInt(year)+1));
+  y += 4;
+
+  y = addPDFSection(doc,W,M,y,'SUBCONTRACTOR PAYMENTS');
+
+  // Table header
+  doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.setTextColor(94,106,210);
+  doc.text('NAME / COMPANY', M, y);
+  doc.text('EIN / SSN', M+70, y);
+  doc.text('AMOUNT PAID', W-M-30, y, {align:'right'});
+  y += 2;
+  doc.setDrawColor(94,106,210); doc.setLineWidth(0.3); doc.line(M,y,W-M,y);
+  y += 5;
+
+  contractors1099.forEach(c => {
+    if (y > H-40) { doc.addPage(); y = 25; }
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(30,30,35);
+    doc.text(c.name || '—', M, y);
+    doc.text(c.ein || '—', M+70, y);
+    doc.text(fmt(parseFloat(c.amount)||0), W-M-30, y, {align:'right'});
+    y += 6;
+  });
+
+  doc.setDrawColor(220,220,225); doc.setLineWidth(0.2); doc.line(M,y,W-M,y);
+  y += 5;
+  doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(15,15,20);
+  doc.text('TOTAL PAID:', M, y);
+  doc.text(fmt(total), W-M-30, y, {align:'right'});
+  y += 10;
+
+  y = addPDFResolved(doc,W,M,y,`All subcontractors paid $600 or more during ${year} have been issued or will be issued IRS Form 1099-NEC by January 31, ${parseInt(year)+1}. Forms submitted electronically via IRS FIRE or payroll provider.`);
+
+  addPDFSignature(doc,W,H,M);
+  finalizePDF(doc,W,H,M,`1099_NEC_Log_${year}.pdf`);
+  markTaskDone('_1099_subs');
+  closeModal('taskModal_1099_sent');
+}
+
+// ── PDF: FORM 1120-S ──────────────────────────────────────────────
+function download1120SPDF() {
+  const year = document.getElementById('s1120_year')?.value || '2025';
+  const filedDate = document.getElementById('s1120_filed_date')?.value || '';
+  const method = document.getElementById('s1120_method')?.value || 'E-file';
+  const income = parseFloat(document.getElementById('s1120_income')?.value) || 0;
+  const deductions = parseFloat(document.getElementById('s1120_deductions')?.value) || 0;
+  const extension = document.getElementById('s1120_extension')?.value || 'No';
+  const net = income - deductions;
+  const fmt = n => '$' + n.toLocaleString('en-US',{minimumFractionDigits:2});
+
+  let {doc,W,H,M,y} = createPDFBase(`Form 1120-S Filing Record ${year}`,`Federal S-Corp Tax Return  ·  Tax Year ${year}`);
+
+  y = addPDFSection(doc,W,M,y,'FILING INFORMATION');
+  y = addPDFRow(doc,W,M,y,'Entity','Start Construction, Inc.');
+  y = addPDFRow(doc,W,M,y,'EIN','99-1788037');
+  y = addPDFRow(doc,W,M,y,'Tax Year',year);
+  y = addPDFRow(doc,W,M,y,'Filing Deadline','March 15, ' + (parseInt(year)+1));
+  if (filedDate) y = addPDFRow(doc,W,M,y,'Filed Date',new Date(filedDate+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}));
+  y = addPDFRow(doc,W,M,y,'Filing Method',method);
+  y = addPDFRow(doc,W,M,y,'Extension Filed',extension);
+  y += 4;
+
+  y = addPDFSection(doc,W,M,y,'INCOME SUMMARY');
+  y = addPDFRow(doc,W,M,y,'Total Income',fmt(income));
+  y = addPDFRow(doc,W,M,y,'Total Deductions',fmt(deductions));
+  y = addPDFRow(doc,W,M,y,'Net Income / (Loss)',fmt(net),true);
+  y += 6;
+
+  y = addPDFResolved(doc,W,M,y,`Form 1120-S for tax year ${year} has been prepared and filed ${method === 'E-file' ? 'electronically' : 'by mail'} with the Internal Revenue Service. All shareholders have received Schedule K-1.`);
+
+  addPDFSignature(doc,W,H,M);
+  finalizePDF(doc,W,H,M,`Form_1120S_${year}.pdf`);
+  markTaskDone('_1120s');
+  closeModal('taskModal_1120s_filed');
+}
+
+// ── PDF: CA FORM 100S ─────────────────────────────────────────────
+function downloadCA100SPDF() {
+  const year = document.getElementById('ca100_year')?.value || '2025';
+  const filedDate = document.getElementById('ca100_filed_date')?.value || '';
+  const confNum = document.getElementById('ca100_conf')?.value || '';
+
+  let {doc,W,H,M,y} = createPDFBase(`CA Form 100S Filing Record ${year}`,`California S-Corp Franchise Tax Return  ·  Tax Year ${year}`);
+
+  y = addPDFSection(doc,W,M,y,'FILING INFORMATION');
+  y = addPDFRow(doc,W,M,y,'Entity','Start Construction, Inc.');
+  y = addPDFRow(doc,W,M,y,'CA Entity Number','6117165');
+  y = addPDFRow(doc,W,M,y,'Tax Year',year);
+  y = addPDFRow(doc,W,M,y,'Filing Deadline','March 15, ' + (parseInt(year)+1));
+  if (filedDate) y = addPDFRow(doc,W,M,y,'Filed Date',new Date(filedDate+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}));
+  if (confNum) y = addPDFRow(doc,W,M,y,'CA Confirmation #',confNum,true);
+  y += 4;
+
+  y = addPDFSection(doc,W,M,y,'CONFIRMATION');
+  y = addPDFResolved(doc,W,M,y,`CA Form 100S for tax year ${year} has been filed with the California Franchise Tax Board. Minimum franchise tax of $800 has been paid.`);
+
+  addPDFSignature(doc,W,H,M);
+  finalizePDF(doc,W,H,M,`CA_100S_${year}.pdf`);
+  markTaskDone('ca_100s');
+  closeModal('taskModal_100s_filed');
+}
+
+// ── PDF: SI-200 FILING RECORD ─────────────────────────────────────
+function downloadSI200PDF() {
+  const year = document.getElementById('si200_year')?.value || '2026';
+  const filedDate = document.getElementById('si200_filed_date')?.value || '';
+  const confNum = document.getElementById('si200_conf')?.value || '';
+
+  let {doc,W,H,M,y} = createPDFBase(`Statement of Information SI-200`,`CA Secretary of State Filing  ·  ${year}`);
+
+  y = addPDFSection(doc,W,M,y,'ENTITY DETAILS');
+  y = addPDFRow(doc,W,M,y,'Entity Name','Start Construction, Inc.');
+  y = addPDFRow(doc,W,M,y,'Entity Number','6117165');
+  y = addPDFRow(doc,W,M,y,'EIN','99-1788037');
+  y = addPDFRow(doc,W,M,y,'Incorporation Date','February 26, 2024');
+  y = addPDFRow(doc,W,M,y,'Principal Address','2800 Walnut Ave, Apt 43, Carmichael, CA 95608');
+  y = addPDFRow(doc,W,M,y,'Agent for Service','Aleksandr Zakirov');
+  y += 4;
+
+  y = addPDFSection(doc,W,M,y,'OFFICERS / DIRECTORS');
+  [['President','Aleksandr Zakirov'],['Secretary','Aleksandr Zakirov'],['Treasurer','Aleksandr Zakirov'],['Director','Aleksandr Zakirov']].forEach(([r,v]) => { y = addPDFRow(doc,W,M,y,r,v); });
+  y += 4;
+
+  y = addPDFSection(doc,W,M,y,'FILING RECORD');
+  if (filedDate) y = addPDFRow(doc,W,M,y,'Filed Date',new Date(filedDate+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}));
+  if (confNum) y = addPDFRow(doc,W,M,y,'Confirmation #',confNum,true);
+  y = addPDFRow(doc,W,M,y,'Filing Fee','$25.00');
+  y = addPDFRow(doc,W,M,y,'Filed With','CA Secretary of State');
+  y += 4;
+
+  y = addPDFResolved(doc,W,M,y,'Statement of Information (SI-200) has been filed with the California Secretary of State as required annually. All information is current and accurate.');
+
+  addPDFSignature(doc,W,H,M);
+  finalizePDF(doc,W,H,M,`SI200_Filing_${year}.pdf`);
+  markTaskDone('si200');
+  closeModal('taskModal_si200_filed');
+}
+
+// ── PDF: INSURANCE RENEWAL ────────────────────────────────────────
+function downloadInsurancePDF() {
+  const policyType = document.getElementById('ins_type')?.value || 'Workers Compensation';
+  const oldPolicy = document.getElementById('ins_old_policy')?.value || '';
+  const oldExpiry = document.getElementById('ins_old_expiry')?.value || '';
+  const newPolicy = document.getElementById('ins_new_policy')?.value || '';
+  const newStart = document.getElementById('ins_new_start')?.value || '';
+  const newExpiry = document.getElementById('ins_new_expiry')?.value || '';
+  const premium = parseFloat(document.getElementById('ins_premium')?.value) || 0;
+  const notes = document.getElementById('ins_notes')?.value || '';
+  const year = new Date().getFullYear();
+  const fmtDate = d => d ? new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : '—';
+
+  let {doc,W,H,M,y} = createPDFBase(`Insurance Renewal Record`,`${policyType}  ·  Start Construction, Inc.`);
+
+  y = addPDFSection(doc,W,M,y,'PREVIOUS POLICY');
+  y = addPDFRow(doc,W,M,y,'Policy Type',policyType);
+  y = addPDFRow(doc,W,M,y,'Policy Number',oldPolicy);
+  y = addPDFRow(doc,W,M,y,'Expiration Date',fmtDate(oldExpiry));
+  y += 4;
+
+  y = addPDFSection(doc,W,M,y,'NEW POLICY DETAILS');
+  y = addPDFRow(doc,W,M,y,'New Policy #',newPolicy,true);
+  y = addPDFRow(doc,W,M,y,'Effective Date',fmtDate(newStart));
+  y = addPDFRow(doc,W,M,y,'Expiration Date',fmtDate(newExpiry),true);
+  y = addPDFRow(doc,W,M,y,'Annual Premium',premium ? '$'+premium.toLocaleString('en-US',{minimumFractionDigits:2}) : '—');
+  y += 4;
+
+  y = addPDFSection(doc,W,M,y,'AGENT INFORMATION');
+  y = addPDFRow(doc,W,M,y,'Agent','Mark Florea');
+  y = addPDFRow(doc,W,M,y,'Agency','Pro-Builders Insurance Agency');
+  y = addPDFRow(doc,W,M,y,'Phone','(916) 964-0717');
+  y = addPDFRow(doc,W,M,y,'Email','mark@insureprobuilders.com');
+  y += 4;
+
+  if (notes.trim()) {
+    y = addPDFSection(doc,W,M,y,'NOTES');
+    const nl = doc.splitTextToSize(notes, W-M*2);
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(30,30,35);
+    doc.text(nl, M, y); y += nl.length*4.5+6;
+  }
+
+  y = addPDFResolved(doc,W,M,y,`${policyType} insurance policy has been successfully renewed. New policy is in effect and all required documentation has been received.`);
+
+  addPDFSignature(doc,W,H,M);
+  finalizePDF(doc,W,H,M,`Insurance_Renewal_${policyType.replace(/\s/g,'_')}_${year}.pdf`);
+  markTaskDone('insurance_renew');
+  closeModal('taskModal_insurance_renewed');
+}
+
 // ── COUNTER ANIMATION ─────────────────────────────────────────────
 function animateCounter(el, target, prefix, duration) {
   if (!el || isNaN(target) || target === 0) return;
@@ -2788,6 +3663,14 @@ document.addEventListener('click', e => {
 
 // ── INIT ──────────────────────────────────────────────────────────
 render();
+// Init contractor list for 1099 modal
+setTimeout(() => { renderContractors1099(); }, 0);
+// Pre-fill AM date to today
+const amDate = document.getElementById('am_date');
+if (amDate) amDate.value = new Date().toISOString().slice(0,10);
+// Pre-fill AM salary from settings
+const amSalary = document.getElementById('am_salary');
+if (amSalary && D.settings.salary) amSalary.value = D.settings.salary;
 
 </script>
 </body>
