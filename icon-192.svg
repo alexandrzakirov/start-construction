@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
-  <rect width="100%" height="100%" rx="20" fill="#f5a623"/>
-  <g fill="#fff" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="56" text-anchor="middle">
-    <text x="96" y="114">SC</text>
-  </g>
+  <rect width="192" height="192" rx="20" fill="#e8eaed"/>
+  <!-- Outer roof -->
+  <path d="M20,100 L96,28 L172,100" stroke="#b56e00" stroke-width="6.5" fill="none" stroke-linecap="round" stroke-linejoin="miter"/>
+  <!-- White fill between lines -->
+  <path d="M20,100 L96,28 L172,100 L159,100 L96,43 L33,100 Z" fill="#e8eaed"/>
+  <!-- Inner roof -->
+  <path d="M33,100 L96,43 L159,100" stroke="#b56e00" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="miter"/>
+  <!-- SC text -->
+  <text x="96" y="148" text-anchor="middle"
+        font-family="'Arial Black',Arial,sans-serif"
+        font-size="44" font-weight="900" font-style="italic" fill="#b56e00">SC</text>
+  <text x="96" y="167" text-anchor="middle"
+        font-family="'Courier New',monospace"
+        font-size="11" font-weight="700" fill="#4a5260" letter-spacing="1.5">CONSTRUCTION</text>
 </svg>

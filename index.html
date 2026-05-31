@@ -269,9 +269,124 @@ select option{background:#fff}
 /* SCROLLBAR HIDE */
 .scroll-area::-webkit-scrollbar{display:none}
 .modal-sheet::-webkit-scrollbar{display:none}
+
+/* ═══════════════════════════════════════════════════
+   ANIMATIONS & VISUAL POLISH
+   ═══════════════════════════════════════════════════ */
+
+/* ── KEYFRAMES ─────────────────────────────────── */
+@keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes cardIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulseBadge{0%,100%{opacity:1}50%{opacity:.45}}
+@keyframes rippleAnim{from{transform:scale(0);opacity:.5}to{transform:scale(4);opacity:0}}
+@keyframes splashFadeIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+@keyframes underlExp{from{width:0}to{width:20px}}
+
+/* ── PAGE TRANSITION ──────────────────────────── */
+.page.active{animation:pageIn .22s cubic-bezier(.4,0,.2,1) both}
+
+/* ── NAV BUTTON ──────────────────────────────── */
+.nav-btn{transition:color .15s,transform .1s}
+.nav-btn:active{transform:scale(.86) !important}
+.nav-btn::after{content:'';position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:0;height:2px;background:var(--accent);border-radius:2px;transition:width .2s cubic-bezier(.4,0,.2,1)}
+.nav-btn.active::after{width:20px}
+
+/* ── STAT BOXES STAGGER ─────────────────────── */
+.stat-row .stat-box{animation:cardIn .3s ease both}
+.stat-row .stat-box:nth-child(1){animation-delay:.03s}
+.stat-row .stat-box:nth-child(2){animation-delay:.09s}
+.stat-row .stat-box:nth-child(3){animation-delay:.15s}
+.stat-row .stat-box:nth-child(4){animation-delay:.21s}
+
+/* ── ALERT BANNERS SLIDE ─────────────────────── */
+.alert-banner{animation:slideDown .25s ease both}
+
+/* ── QUICK LINK HOVER LIFT ───────────────────── */
+.link-tile{transition:transform .15s ease,box-shadow .15s ease,border-color .15s}
+.link-tile:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(0,0,0,.10)}
+
+/* ── BADGE PULSE FOR CRITICAL ────────────────── */
+.badge-critical,.badge-expired{animation:pulseBadge 1.6s ease-in-out infinite}
+
+/* ── CARD ENTRANCE ───────────────────────────── */
+.card{animation:cardIn .28s ease both}
+
+/* ── CHECK ROW ANIMATION ─────────────────────── */
+.check-row{transition:opacity .3s ease,background .1s}
+.check-box{transition:all .22s cubic-bezier(.34,1.56,.64,1)}
+.check-row.done .check-box{transform:scale(1.15)}
+
+/* ── PROGRESS BAR ────────────────────────────── */
+.progress-fill{transition:width 1s cubic-bezier(.4,0,.2,1) !important}
+
+/* ── VENDOR BODY MAX-HEIGHT ANIMATION ───────── */
+/* Override display:none with max-height transition */
+.vendor-body{
+  display:block !important;
+  max-height:0;
+  overflow:hidden;
+  padding-top:0 !important;
+  padding-bottom:0 !important;
+  border-top:0px solid var(--border) !important;
+  transition:max-height .32s cubic-bezier(.4,0,.2,1), padding .22s ease, border-top-width .22s;
+}
+.vendor-body.open{
+  max-height:900px;
+  padding-top:14px !important;
+  padding-bottom:14px !important;
+  border-top-width:1px !important;
+}
+.vendor-card{transition:box-shadow .2s ease;cursor:default}
+
+/* ── BUTTON RIPPLE ───────────────────────────── */
+.btn{position:relative;overflow:hidden}
+.ripple-wave{position:absolute;border-radius:50%;background:rgba(255,255,255,.28);width:60px;height:60px;margin:-30px;pointer-events:none;animation:rippleAnim .55s linear forwards}
+
+/* ── SCROLL SHADOW ───────────────────────────── */
+#scrollShadow{position:sticky;top:0;height:6px;z-index:5;background:linear-gradient(rgba(0,0,0,.09),transparent);opacity:0;transition:opacity .2s;pointer-events:none;margin-bottom:-6px}
+
+/* ── SPLASH SCREEN ───────────────────────────── */
+#splash{
+  position:fixed;inset:0;background:#e8eaed;z-index:9999;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+  transition:opacity .45s ease,transform .45s ease;
+}
+#splash.out{opacity:0;transform:scale(1.04);pointer-events:none}
+.splash-logo-wrap{animation:splashFadeIn .5s .08s cubic-bezier(.4,0,.2,1) both}
+.splash-tagline{
+  font-size:10px;font-family:var(--mono);color:var(--muted2);
+  letter-spacing:3px;text-transform:uppercase;
+  animation:splashFadeIn .4s .32s ease both;
+}
 </style>
 </head>
 <body>
+
+<!-- SPLASH SCREEN -->
+<div id="splash">
+  <div class="splash-logo-wrap">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 180" width="240" height="144">
+      <!-- Outer roof -->
+      <path d="M15,95 L150,10 L285,95" stroke="#1a1e24" stroke-width="6.5" fill="none" stroke-linecap="round" stroke-linejoin="miter"/>
+      <!-- White fill between lines -->
+      <path d="M15,95 L150,10 L285,95 L270,95 L150,26 L30,95 Z" fill="#e8eaed"/>
+      <!-- Inner roof -->
+      <path d="M30,95 L150,26 L270,95" stroke="#1a1e24" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="miter"/>
+      <!-- START -->
+      <text x="150" y="143" text-anchor="middle"
+            font-family="'Arial Black','Franklin Gothic Heavy','Impact',Arial,sans-serif"
+            font-size="72" font-weight="900" font-style="italic"
+            fill="#1a1e24" letter-spacing="-1">START</text>
+      <!-- CONSTRUCTION -->
+      <text x="150" y="168" text-anchor="middle"
+            font-family="'Arial Black','Franklin Gothic Heavy','Impact',Arial,sans-serif"
+            font-size="25" font-weight="900"
+            fill="#1a1e24" letter-spacing="3">CONSTRUCTION</text>
+    </svg>
+  </div>
+  <div class="splash-tagline">CSLB #1123785 · California S-Corp</div>
+</div>
 
 <div class="app">
   <div class="status-bar"></div>
@@ -279,7 +394,13 @@ select option{background:#fff}
   <!-- TOP HEADER -->
   <div class="top-header">
     <div class="header-left">
-      <div class="header-logo">SC</div>
+      <div class="header-logo" style="background:none;border:none;width:38px;height:38px;padding:0">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38 38" width="38" height="38">
+          <path d="M4,26 L19,6 L34,26" stroke="#b56e00" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="miter"/>
+          <path d="M4,26 L19,6 L34,26 L31,26 L19,10 L7,26 Z" fill="#e8eaed"/>
+          <path d="M7,26 L19,10 L31,26" stroke="#b56e00" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="miter"/>
+        </svg>
+      </div>
       <div>
         <div class="header-title">Start Construction</div>
         <div class="header-sub">CSLB #1123785 · S-Corp</div>
@@ -290,6 +411,7 @@ select option{background:#fff}
 
   <!-- SCROLL AREA -->
   <div class="scroll-area" id="scrollArea">
+    <div id="scrollShadow"></div>
 
     <!-- DASHBOARD PAGE -->
     <div class="page active" id="page-dashboard">
@@ -928,7 +1050,12 @@ let currentPage = 'dashboard';
 function goPage(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
+  const pageEl = document.getElementById('page-' + page);
+  pageEl.classList.add('active');
+  // Restart page-in animation on each visit
+  pageEl.style.animation = 'none';
+  pageEl.offsetHeight;
+  pageEl.style.animation = '';
   document.getElementById('nav-' + page).classList.add('active');
   document.getElementById('scrollArea').scrollTop = 0;
   currentPage = page;
@@ -1024,6 +1151,12 @@ function renderDashboard(alerts) {
   document.getElementById('statDist').textContent = fmtMoney(total2025);
   document.getElementById('statDistSub').textContent = dists2025.length + ' this year';
   document.getElementById('statTax').textContent = fmtMoney(Math.round(total2025 * 0.3));
+
+  // Counter animation for stat values
+  animateCounter(document.getElementById('statAlerts'), alerts.length, '', 600);
+  animateCounter(document.getElementById('statChecklist'), pct, '%', 800);
+  animateCounter(document.getElementById('statDist'), total2025, '$', 900);
+  animateCounter(document.getElementById('statTax'), Math.round(total2025 * 0.3), '$', 900);
 
   // Compliance summary
   const allItems = [
@@ -2129,6 +2262,24 @@ function renderVendors() {
 function toggleVendor(id) {
   vendorOpenId = vendorOpenId === id ? null : id;
   renderVendors();
+  // Trigger open animation: newly rendered .open body starts at CSS max-height:900px,
+  // so we reset to 0 then let transition carry it up
+  if (vendorOpenId !== null) {
+    requestAnimationFrame(() => {
+      const openBody = document.querySelector('.vendor-body.open');
+      if (openBody) {
+        openBody.style.transition = 'none';
+        openBody.style.maxHeight = '0';
+        openBody.style.paddingTop = '0';
+        openBody.style.paddingBottom = '0';
+        openBody.offsetHeight; // force reflow
+        openBody.style.transition = '';
+        openBody.style.maxHeight = '900px';
+        openBody.style.paddingTop = '14px';
+        openBody.style.paddingBottom = '14px';
+      }
+    });
+  }
 }
 
 function togglePwd(id, pwd) {
@@ -2570,6 +2721,70 @@ function initVaultUpload() {
     if (files?.length) handleFileUpload({ target: { files, value:'' } });
   });
 }
+
+// ── COUNTER ANIMATION ─────────────────────────────────────────────
+function animateCounter(el, target, prefix, duration) {
+  if (!el || isNaN(target) || target === 0) return;
+  const startTime = performance.now();
+  const easeOut = t => 1 - Math.pow(1 - t, 3);
+  function step(now) {
+    const t = Math.min((now - startTime) / duration, 1);
+    const current = Math.round(target * easeOut(t));
+    if (prefix === '$') {
+      el.textContent = '$' + current.toLocaleString();
+    } else if (prefix === '%') {
+      el.textContent = current + '%';
+    } else {
+      el.textContent = current;
+    }
+    if (t < 1) requestAnimationFrame(step);
+    else {
+      // Ensure exact final value
+      if (prefix === '$') el.textContent = '$' + Number(target).toLocaleString();
+      else if (prefix === '%') el.textContent = target + '%';
+      else el.textContent = target;
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+// ── RIPPLE EFFECT ─────────────────────────────────────────────────
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.btn, .nav-btn');
+  if (!btn) return;
+  const rect = btn.getBoundingClientRect();
+  const wave = document.createElement('span');
+  wave.className = 'ripple-wave';
+  wave.style.left = (e.clientX - rect.left) + 'px';
+  wave.style.top  = (e.clientY - rect.top)  + 'px';
+  btn.appendChild(wave);
+  setTimeout(() => wave.remove(), 600);
+}, true);
+
+// ── SCROLL SHADOW ─────────────────────────────────────────────────
+(function() {
+  const sa = document.getElementById('scrollArea');
+  const sh = document.getElementById('scrollShadow');
+  if (!sa || !sh) return;
+  sa.addEventListener('scroll', () => {
+    sh.style.opacity = sa.scrollTop > 8 ? '1' : '0';
+  }, { passive: true });
+})();
+
+// ── SPLASH SCREEN FADE OUT ────────────────────────────────────────
+(function() {
+  const splash = document.getElementById('splash');
+  if (!splash) return;
+  const hide = () => {
+    splash.classList.add('out');
+    setTimeout(() => splash.remove(), 500);
+  };
+  if (document.readyState === 'complete') {
+    setTimeout(hide, 820);
+  } else {
+    window.addEventListener('load', () => setTimeout(hide, 820));
+  }
+})();
 
 // ── INIT ──────────────────────────────────────────────────────────
 render();
