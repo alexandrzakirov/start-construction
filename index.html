@@ -8,12 +8,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Start Const.">
   <meta name="mobile-web-app-capable" content="yes">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:;">
 <link rel="manifest" href="/start-construction/manifest.json">
   <link rel="apple-touch-icon" href="/start-construction/icon-192.svg">
   <link rel="icon" href="/start-construction/icon-192.svg">
 <title>Start Construction, Inc.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 /* ── RESET & BASE ─────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -77,30 +79,29 @@ body{height:100%;overflow:hidden;background:#dde0e4;color:#1a1e24;font-family:'S
 .bottom-nav{
   display:flex;
   flex-direction:row;
+  flex-wrap:nowrap;
   background:#e8eaed;
   border-top:1px solid var(--border);
   padding-bottom:var(--safe-bottom);
   flex-shrink:0;
-  overflow-x:auto;
-  overflow-y:hidden;
-  scrollbar-width:none;
-  -ms-overflow-style:none;
-  scroll-snap-type:x mandatory;
+  width:100%;
+  overflow:visible;
 }
-.bottom-nav::-webkit-scrollbar{display:none}
 .nav-btn{
-  flex:0 0 auto;
-  min-width:64px;
+  flex:1 1 0;
+  min-width:0;
   display:flex;flex-direction:column;align-items:center;
-  gap:2px;padding:8px 4px 6px;
+  gap:1px;padding:8px 2px 6px;
   background:none;border:none;color:var(--muted2);
-  font-size:9px;font-family:'Syne',sans-serif;font-weight:600;
+  font-size:8px;font-family:'Syne',sans-serif;font-weight:600;
   cursor:pointer;transition:color .15s;position:relative;
   -webkit-tap-highlight-color:transparent;
-  scroll-snap-align:start;
+  overflow:hidden;
 }
 .nav-btn.active{color:var(--accent)}
+.nav-btn:hover{color:var(--text)}
 .nav-btn .nav-icon{font-size:20px;line-height:1}
+.nav-btn span:not(.nav-icon):not(.nav-dot){font-size:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;display:block}
 .nav-dot{
   position:absolute;top:8px;right:calc(50% - 16px);
   width:8px;height:8px;border-radius:50%;
@@ -158,79 +159,138 @@ body{height:100%;overflow:hidden;background:#dde0e4;color:#1a1e24;font-family:'S
 .alert-text{font-size:13px;font-weight:700}
 .alert-sub{font-size:11px;color:var(--muted2);font-family:var(--mono);margin-top:2px}
 
-function loadVault() {
-  try {
-    const r = localStorage.getItem(GDRIVE_KEY);
-    return r ? JSON.parse(r) : [...GDRIVE_DOCS];
-  } catch { return [...GDRIVE_DOCS]; }
+/* ── ROWS ────────────────────────────────────────────── */
+.row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--border)}
+.row:last-child{border-bottom:none}
+.row-label{font-size:13px;font-weight:600}
+.row-sub{font-size:11px;color:var(--muted2);font-family:var(--mono);margin-top:2px}
+.row-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+
+/* ── CHECKLIST ───────────────────────────────────────── */
+.check-row{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.check-row:active{background:rgba(0,0,0,.04)}
+.check-row.done{opacity:.5}
+.check-box{width:20px;height:20px;border:2px solid var(--border2);border-radius:4px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s;font-size:12px;color:#fff}
+.check-row.done .check-box{background:var(--green);border-color:var(--green)}
+.check-text{flex:1}
+.check-label{font-size:13px;font-weight:600;line-height:1.3}
+.check-due{font-size:11px;color:var(--muted2);font-family:var(--mono);margin-top:3px}
+
+/* ── FORMS ───────────────────────────────────────────── */
+.field{margin-bottom:14px}
+.field-label{font-size:10px;font-family:var(--mono);color:var(--muted2);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px}
+input[type=text],input[type=number],input[type=date],input[type=email],input[type=tel],select,textarea{
+  width:100%;background:#fff;border:1px solid var(--border2);border-radius:7px;
+  color:var(--text);font-family:var(--mono);font-size:14px;padding:11px 13px;
+  outline:none;transition:border-color .15s;appearance:none;-webkit-appearance:none;
 }
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+input::placeholder{color:var(--muted)}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a5260' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+select option{background:#fff}
 
-function saveVault(files) {
-  try { localStorage.setItem(GDRIVE_KEY, JSON.stringify(files)); } catch(e) { showToast('⚠ Storage full — delete old documents'); }
-}
+/* ── BUTTONS ─────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 18px;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .15s;text-transform:uppercase;letter-spacing:.5px;text-decoration:none;-webkit-tap-highlight-color:transparent}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:active{background:#8a5300}
+.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border2)}
+.btn-ghost:active{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:var(--red-dim);color:var(--red);border:1px solid transparent}
+.btn-danger:active{border-color:var(--red)}
+.btn-sm{padding:7px 12px;font-size:11px;border-radius:6px}
+.btn-full{width:100%}
 
-function getFileExt(name) { return (name.split('.').pop() || '').toLowerCase(); }
-function getFileIcon(name) { return FILE_ICONS[getFileExt(name)] || '📁'; }
-function fmtSize(bytes) { if (bytes < 1024) return bytes + ' B'; if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB'; return (bytes/1024/1024).toFixed(1) + ' MB'; }
+/* ── SECTION HEADERS ─────────────────────────────────── */
+.section-head{font-size:9px;font-family:var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:2px;padding:16px 16px 6px}
 
-function handleFileUpload(event) { event.target.value = ''; openAddDocModal(); }
-function downloadFile(id) { const vault = loadVault(); const file = vault.find(f => f.id === id); if (!file) return; if (file.url) window.open(file.url.replace('/preview',''),'_blank'); }
-function viewFile(id) { const vault = loadVault(); const file = vault.find(f => f.id === id); if (!file) return; if (file.url) viewGDriveDoc(file.url); }
+/* ── QUICK LINKS GRID ────────────────────────────────── */
+.links-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px;margin-bottom:14px}
+.link-tile{display:flex;flex-direction:column;gap:6px;padding:14px;background:#fff;border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--text);transition:border-color .15s;-webkit-tap-highlight-color:transparent}
+.link-tile:active{border-color:var(--accent)}
+.link-icon{font-size:24px}
+.link-label{font-size:12px;font-weight:700;line-height:1.2}
+.link-url{font-size:10px;color:var(--muted2);font-family:var(--mono)}
 
-function deleteFile(id) { if (!confirm('Delete this document?')) return; const vault = loadVault().filter(f => f.id !== id); saveVault(vault); showToast('🗑 Deleted'); renderVault(); }
-function changeCat(id, newCat) { const vault = loadVault(); const file = vault.find(f => f.id === id); if (file) { file.category = newCat; saveVault(vault); renderVault(); } }
+/* ── DISTRIBUTION ROW ────────────────────────────────── */
+.dist-row{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border)}
+.dist-qtr{font-weight:700;font-size:13px}
+.dist-date{font-size:10px;color:var(--muted2);font-family:var(--mono);margin-top:2px}
+.dist-amount{font-size:16px;font-weight:800;color:var(--green);font-family:var(--mono)}
 
-function renderVault() { renderGDriveVault(); }
+/* ── MODAL ───────────────────────────────────────────── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;flex-direction:column;justify-content:flex-end;z-index:100;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-sheet{background:var(--surface);border-radius:20px 20px 0 0;padding:0 0 var(--safe-bottom);max-height:90dvh;overflow-y:auto;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1)}
+.modal-overlay.open .modal-sheet{transform:translateY(0)}
+.modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border2);margin:12px auto 4px}
+.modal-head{padding:12px 16px 16px;border-bottom:1px solid var(--border)}
+.modal-title{font-size:17px;font-weight:800}
+.modal-body{padding:16px}
 
-function convertGDriveLink(url) {
-  if (!url) return '';
-  const fileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-  const openMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-  const docsMatch = url.match(/\/document\/d\/([a-zA-Z0-9_-]+)/);
-  const sheetsMatch = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
-  const slidesMatch = url.match(/\/presentation\/d\/([a-zA-Z0-9_-]+)/);
-  const id = (fileMatch || openMatch || docsMatch || sheetsMatch || slidesMatch)?.[1];
-  if (id) return `https://drive.google.com/file/d/${id}/preview`;
-  return url;
-}
+/* ── TOAST ───────────────────────────────────────────── */
+.toast{position:fixed;bottom:calc(72px + var(--safe-bottom));left:50%;transform:translateX(-50%) translateY(20px);background:var(--green);color:#fff;font-size:12px;font-weight:700;font-family:var(--mono);padding:8px 20px;border-radius:20px;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;z-index:200}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-function viewGDriveDoc(url) { if (!url) { alert('No Google Drive link added yet.\nUpload to drive.google.com and paste the share link.'); return; } window.open(url, '_blank'); }
+/* ── VENDOR ──────────────────────────────────────────── */
+.vendor-card{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:0 16px 10px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.vendor-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;gap:10px}
+.vendor-body{display:none;border-top:1px solid var(--border);padding:14px 16px}
+.vendor-body.open{display:block}
+.vendor-name{font-size:14px;font-weight:700;margin-bottom:2px}
+.vendor-account{font-size:11px;color:var(--muted2);font-family:var(--mono)}
+.vendor-logo{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0}
+.vendor-field{display:flex;align-items:flex-start;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)}
+.vendor-field:last-of-type{border-bottom:none}
+.vendor-field-label{font-size:10px;font-family:var(--mono);color:var(--muted2);text-transform:uppercase;letter-spacing:1px;width:56px;flex-shrink:0;padding-top:2px}
+.vendor-field-value{font-size:13px;font-family:var(--mono);flex:1;word-break:break-all}
+.vendor-status-badge{font-size:9px;font-family:var(--mono);font-weight:700;padding:3px 8px;border-radius:12px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.vs-active{background:var(--green-dim);color:var(--green)}
+.vs-pending{background:var(--yellow-dim);color:var(--yellow)}
+.vs-needed{background:var(--red-dim);color:var(--red)}
 
-function openAddDocModal() { const modal = document.getElementById('gdriveAddModal'); if (!modal) return showToast('Modal not found'); document.getElementById('gdriveName').value = ''; document.getElementById('gdriveCategory').value = 'Formation'; document.getElementById('gdriveUrl').value = ''; document.getElementById('gdriveNotes').value = ''; document.getElementById('gdriveCurrentId').value = ''; modal.style.display = 'flex'; }
-function closeAddDocModal() { const modal = document.getElementById('gdriveAddModal'); if (modal) modal.style.display = 'none'; }
+/* ── FILE VAULT ──────────────────────────────────────── */
+.file-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.file-row:last-child{border-bottom:none}
+.file-icon-box{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.file-info{flex:1;min-width:0}
+.file-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file-meta{font-size:10px;color:var(--muted2);font-family:var(--mono);margin-top:2px}
+.file-actions{display:flex;gap:6px;flex-shrink:0}
+.req-row{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border)}
+.req-row:last-child{border-bottom:none}
+.req-check{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.req-check.uploaded{background:var(--green-dim);color:var(--green)}
+.req-check.missing{background:var(--border);color:var(--muted2)}
+.filter-btn{padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:#fff;color:var(--text);font-size:11px;font-family:var(--mono);font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
+.filter-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.empty-vault{padding:32px 16px;text-align:center;color:var(--muted2);font-size:13px;font-family:var(--mono)}
+.drag-over{border-color:var(--accent) !important;background:var(--accent-dim) !important}
 
-function saveGDriveDoc() {
-  const name = document.getElementById('gdriveName')?.value?.trim();
-  const category = document.getElementById('gdriveCategory')?.value || 'Other';
-  let url = document.getElementById('gdriveUrl')?.value?.trim() || '';
-  const notes = document.getElementById('gdriveNotes')?.value?.trim() || '';
-  const currentId = document.getElementById('gdriveCurrentId')?.value || '';
-  if (!name) return showToast('Enter document name');
-  url = convertGDriveLink(url);
-  const docs = loadVault();
-  if (currentId) { const doc = docs.find(d => String(d.id) === String(currentId)); if (doc) { doc.name = name; doc.category = category; doc.url = url; doc.notes = notes; doc.addedAt = doc.addedAt || new Date().toISOString(); saveVault(docs); closeAddDocModal(); renderVault(); showToast('✓ Document updated'); return; } }
-  const id = Date.now() + Math.floor(Math.random()*1000);
-  docs.push({ id, name, category, url, notes, addedAt: new Date().toISOString() }); saveVault(docs); closeAddDocModal(); renderVault(); showToast('✓ Document added');
-}
+/* SCROLLBAR HIDE */
+.scroll-area::-webkit-scrollbar{display:none}
+.modal-sheet::-webkit-scrollbar{display:none}
+</style>
+</head>
+<body>
 
-function editGDriveDoc(id) { const docs = loadVault(); const doc = docs.find(d => d.id === id); if (!doc) return; document.getElementById('gdriveName').value = doc.name; document.getElementById('gdriveCategory').value = doc.category; document.getElementById('gdriveUrl').value = doc.url; document.getElementById('gdriveNotes').value = doc.notes; document.getElementById('gdriveCurrentId').value = id; const modal = document.getElementById('gdriveAddModal'); if (modal) modal.style.display = 'flex'; }
+<div class="app">
+  <div class="status-bar"></div>
 
-function renderGDriveVault() {
-  let docs = loadVault();
-  const search = (document.getElementById('vaultSearch')?.value || '').toLowerCase();
-  if (vaultFilter !== 'All') docs = docs.filter(d => d.category === vaultFilter);
-  if (search) docs = docs.filter(d => (d.name||'').toLowerCase().includes(search) || (d.notes||'').toLowerCase().includes(search));
-  const allDocs = loadVault();
-  const cats = FILE_CATEGORIES.filter(c => c === 'All' || allDocs.some(d => d.category === c));
-  document.getElementById('vaultFilters').innerHTML = cats.map(c => `<button class="filter-btn ${vaultFilter === c ? 'active' : ''}" onclick="vaultFilter='${c}';renderGDriveVault()">${c}</button>`).join('');
-  const info = document.getElementById('storageInfo'); if (info) info.textContent = allDocs.length + ' document' + (allDocs.length !== 1 ? 's' : '');
-  const list = document.getElementById('vaultFileList'); if (!list) return;
-  if (!docs.length) { list.innerHTML = '<div class="empty-vault">📂 No documents yet. Click "Add Document" to link files from Google Drive.</div>'; renderRequiredDocsList(); return; }
-  list.innerHTML = docs.map(doc => `\n    <div class="file-item" style="border-left: 4px solid ${CAT_COLORS[doc.category] || '#999'}">\n      <div class="file-header">\n        <span class="file-cat-icon" style="color: ${CAT_COLORS[doc.category] || '#999'}">${CAT_ICONS[doc.category] || '📄'}</span>\n        <div class="file-info">\n          <div class="file-name">${doc.name}</div>\n          <div class="file-meta">\n            ${doc.category} · ${new Date(doc.addedAt).toLocaleDateString()}${doc.notes ? ` · ${doc.notes}` : ''}\n          </div>\n        </div>\n      </div>\n      <div class="file-actions">\n        ${doc.url ? `<button class="btn btn-sm btn-primary" onclick="viewGDriveDoc('${doc.url.replace(/'/g,"\\'" )})" title="View">👁 View</button>` : ''}\n        <button class="btn btn-sm" onclick="editGDriveDoc(${doc.id})" title="Edit">✏ Edit</button>\n        <button class="btn btn-danger btn-sm" onclick="deleteFile(${doc.id})" title="Delete">✕</button>\n      </div>\n    </div>\n  `).join('');
-  renderRequiredDocsList();
-}
+  <!-- TOP HEADER -->
+  <div class="top-header">
+    <div class="header-left">
+      <div class="header-logo">SC</div>
+      <div>
+        <div class="header-title">Start Construction</div>
+        <div class="header-sub">CSLB #1123785 · S-Corp</div>
+      </div>
+    </div>
+    <div id="alertPill" class="alert-pill" style="display:none">0 alerts</div>
+  </div>
 
-function renderRequiredDocsList() { const docs = loadVault(); const list = document.getElementById('vaultRequiredList'); if (!list) return; const linked = new Set(docs.map(d => REQUIRED_DOCS.find(r => r.id === d.id)?.id).filter(Boolean)); let reqHtml = `<div style="padding: 16px; border-bottom: 1px solid var(--border);">\n      <div style="font-size: 13px; color: var(--muted); margin-bottom: 12px; font-weight: 600;">📋 REQUIRED DOCUMENTS — ${linked.size}/${REQUIRED_DOCS.length}</div>\n      <div style="display: grid; gap: 8px;">`; reqHtml += REQUIRED_DOCS.map(req => { const hasDoc = linked.has(req.id); return `<div style="display: flex; align-items: center; gap: 8px; padding: 8px; background: ${hasDoc ? 'rgba(22, 102, 56, 0.1)' : 'rgba(181, 42, 28, 0.05)'}; border-radius: 6px; font-size: 12px;"> <span style="font-size: 16px;">${hasDoc ? '✓' : '✗'}</span> <span>${req.label}</span> ${!hasDoc ? `<button class="btn btn-sm btn-primary" onclick="openAddDocModal()" style="margin-left: auto;">+</button>` : ''} </div>`; }).join(''); reqHtml += `</div></div>`; list.innerHTML = reqHtml; }
+  <!-- SCROLL AREA -->
+  <div class="scroll-area" id="scrollArea">
+
     <!-- DASHBOARD PAGE -->
     <div class="page active" id="page-dashboard">
       <div id="dashAlerts"></div>
@@ -411,7 +471,7 @@ function renderRequiredDocsList() { const docs = loadVault(); const list = docum
               <div class="card-title" id="docPreviewTitle">Document</div>
               <div class="card-sub" id="docPreviewDue"></div>
             </div>
-            <button class="btn btn-primary btn-sm" onclick="printDoc()">🖨 Print / PDF</button>
+            <button class="btn btn-primary btn-sm" onclick="printDoc()">📄 Download PDF</button>
           </div>
           <div id="docPreviewContent" style="padding:16px;font-family:var(--mono);font-size:12px;line-height:1.8;white-space:pre-wrap;color:var(--text);background:#fff;border-radius:0 0 10px 10px"></div>
         </div>
@@ -430,17 +490,17 @@ function renderRequiredDocsList() { const docs = loadVault(); const list = docum
 
       <!-- UPLOAD AREA -->
       <div style="padding:0 16px 14px">
-        <label id="uploadLabel" style="
+        <div id="uploadDropZone" onclick="document.getElementById('vaultFileInput').click()" style="
           display:flex;flex-direction:column;align-items:center;justify-content:center;
           gap:10px;padding:24px 16px;
           background:#fff;border:2px dashed var(--border2);border-radius:12px;
-          cursor:pointer;transition:border-color .2s;
+          cursor:pointer;transition:border-color .2s,background .2s;
         ">
-          <input type="file" id="fileInput" multiple accept="*/*" style="display:none" onchange="handleFileUpload(event)">
+          <input type="file" id="vaultFileInput" multiple accept="*/*" style="display:none">
           <span style="font-size:36px">📎</span>
           <span style="font-size:14px;font-weight:700;color:var(--text)">Tap to upload files</span>
           <span style="font-size:11px;color:var(--muted2);font-family:var(--mono);text-align:center">PDF, photos, Word docs, any file<br>Stored on this device only</span>
-        </label>
+        </div>
       </div>
 
       <!-- SEARCH -->
@@ -758,11 +818,11 @@ const KEY = 'sc_pwa_v1';
 const DEFAULT = {
   settings: { ein:'99-1788037', cslb:'1123785', address:'2800 Walnut Ave, Apt 43, Carmichael, CA 95608', phone:'(916) 225-0793', email:'alexandr.zakirov@gmail.com', salary:'', payFreq:'Bi-weekly', entityNum:'6117165', incMonth:'February', siDue:'2026-02-28', epa608:'OiNXMYM1DG' },
   insurance: [
-    { id:1, type:'General Liability',   icon:'🛡', provider:'Pro-Builders Insurance Agency', policy:'', coverage:'', expiry:'', agent:'Mark Florea', agentPhone:'(916) 964-0717' },
-    { id:2, type:'Workers Compensation',icon:'👷', provider:'Clear Spring Property & Casualty', policy:'CWC03618700', coverage:'$1,000,000', expiry:'2026-10-03', agent:'Mark Florea / Pro-Builders', agentPhone:'(916) 964-0717' },
-    { id:3, type:'Commercial Auto',     icon:'🚗', provider:'', policy:'', coverage:'', expiry:'', agent:'', agentPhone:'' },
-    { id:4, type:"Contractor's Bond",   icon:'🔗', provider:'', policy:'', coverage:'$15,000', expiry:'', agent:'', agentPhone:'' },
-    { id:5, type:'Umbrella Policy',     icon:'☂',  provider:'', policy:'', coverage:'', expiry:'', agent:'', agentPhone:'' },
+    { id:1, type:'General Liability',   icon:'🛡', provider:'Pro-Builders Insurance Agency', policy:'', coverage:'', expiry:'', agent:'Mark Florea', agentPhone:'(916) 964-0717', agentEmail:'mark@insureprobuilders.com' },
+    { id:2, type:'Workers Compensation',icon:'👷', provider:'Clear Spring Property & Casualty', policy:'CWC03618700', coverage:'$1,000,000', expiry:'2026-10-03', agent:'Mark Florea', agentPhone:'(916) 964-0717', agentEmail:'mark@insureprobuilders.com' },
+    { id:3, type:'Commercial Auto',     icon:'🚗', provider:'', policy:'', coverage:'', expiry:'', agent:'Mark Florea', agentPhone:'(916) 964-0717', agentEmail:'mark@insureprobuilders.com' },
+    { id:4, type:"Contractor's Bond",   icon:'🔗', provider:'', policy:'', coverage:'$15,000', expiry:'', agent:'Mark Florea', agentPhone:'(916) 964-0717', agentEmail:'mark@insureprobuilders.com' },
+    { id:5, type:'Umbrella Policy',     icon:'☂',  provider:'', policy:'', coverage:'', expiry:'', agent:'', agentPhone:'', agentEmail:'' },
   ],
   distributions: [],
   checklist: {}
@@ -826,6 +886,25 @@ function fmtDate(d) {
 
 function fmtMoney(v) { return '$' + Number(v||0).toLocaleString(); }
 
+function getDateStatusBadge(expiryDateStr) {
+  if (!expiryDateStr) return '';
+  const days = daysUntil(expiryDateStr);
+  if (days === null) return '';
+  const date = new Date(expiryDateStr + 'T00:00:00');
+  const dateLabel = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  if (days < 0) {
+    return `<span style="display:inline-block;background:var(--red-dim);color:var(--red);border:1px solid var(--red);font-size:10px;font-family:var(--mono);padding:2px 8px;border-radius:3px;font-weight:700;margin-top:4px">🚨 EXPIRED ${Math.abs(days)}d ago</span>`;
+  } else if (days <= 30) {
+    return `<span style="display:inline-block;background:var(--red-dim);color:var(--red);font-size:10px;font-family:var(--mono);padding:2px 8px;border-radius:3px;font-weight:700;margin-top:4px">🔴 Expires ${dateLabel} (${days}d)</span>`;
+  } else if (days <= 90) {
+    return `<span style="display:inline-block;background:var(--yellow-dim);color:var(--yellow);font-size:10px;font-family:var(--mono);padding:2px 8px;border-radius:3px;font-weight:700;margin-top:4px">🟡 Expires ${dateLabel} (${days}d)</span>`;
+  } else if (days <= 180) {
+    return `<span style="display:inline-block;background:var(--yellow-dim);color:var(--yellow);font-size:10px;font-family:var(--mono);padding:2px 8px;border-radius:3px;font-weight:700;margin-top:4px">⚠️ Valid until ${dateLabel}</span>`;
+  } else {
+    return `<span style="display:inline-block;background:var(--green-dim);color:var(--green);font-size:10px;font-family:var(--mono);padding:2px 8px;border-radius:3px;margin-top:4px">✓ Valid until ${dateLabel}</span>`;
+  }
+}
+
 function getAlerts() {
   const alerts = [];
   D.insurance.forEach(ins => {
@@ -852,6 +931,7 @@ function goPage(page) {
   document.getElementById('scrollArea').scrollTop = 0;
   currentPage = page;
   render();
+  if (page === 'vault') setTimeout(initVaultUpload, 100);
 }
 
 // ── MODALS ────────────────────────────────────────────────────────
@@ -880,17 +960,21 @@ function showToast(msg) {
 
 // ── RENDER ────────────────────────────────────────────────────────
 function render() {
-  const alerts = getAlerts();
-  renderHeader(alerts);
-  if (currentPage === 'dashboard') renderDashboard(alerts);
-  if (currentPage === 'compliance') renderCompliance(alerts);
-  if (currentPage === 'insurance') renderInsurance();
-  if (currentPage === 'distributions') renderDistributions();
-  if (currentPage === 'checklist') renderChecklist();
-  if (currentPage === 'settings') renderSettings();
-  if (currentPage === 'documents') renderDocuments();
-  if (currentPage === 'vault') renderVault();
-  if (currentPage === 'vendors') renderVendors();
+  try {
+    const alerts = getAlerts();
+    renderHeader(alerts);
+    if (currentPage === 'dashboard') renderDashboard(alerts);
+    if (currentPage === 'compliance') renderCompliance(alerts);
+    if (currentPage === 'insurance') renderInsurance();
+    if (currentPage === 'distributions') renderDistributions();
+    if (currentPage === 'checklist') renderChecklist();
+    if (currentPage === 'settings') renderSettings();
+    if (currentPage === 'documents') renderDocuments();
+    if (currentPage === 'vault') renderVault();
+    if (currentPage === 'vendors') renderVendors();
+  } catch(e) {
+    console.error('Render error:', e);
+  }
 }
 
 function renderHeader(alerts) {
@@ -909,8 +993,8 @@ function renderHeader(alerts) {
 }
 
 function renderDashboard(alerts) {
-  // Alert banners
   const dashAlerts = document.getElementById('dashAlerts');
+  if (!dashAlerts) return;
   if (alerts.length === 0) {
     dashAlerts.innerHTML = `<div class="alert-banner ok" style="margin-top:14px"><div class="alert-icon">✅</div><div><div class="alert-text" style="color:var(--green)">All compliance items current</div><div class="alert-sub">No expirations within 60 days</div></div></div>`;
   } else {
@@ -979,17 +1063,16 @@ function renderCompliance(alerts) {
     const days = daysUntil(item.expiry);
     const st = statusFromDays(days);
     const daysColor = st === 'ok' ? 'var(--green)' : st === 'warning' ? 'var(--yellow)' : st === 'empty' ? 'var(--muted2)' : 'var(--red)';
-    return `<div class="row">
-      <div>
+    const daysLabel = days === null ? '—' : days < 0 ? Math.abs(days) + 'd ago' : days + 'd left';
+    return `<div class="row" style="align-items:flex-start">
+      <div style="flex:1">
         <div class="row-label">${item.icon} ${item.name}</div>
         <div class="row-sub">${item.provider}${item.policy ? ' · ' + item.policy : ''}</div>
-        <div class="row-sub">${fmtDate(item.expiry)}</div>
+        ${getDateStatusBadge(item.expiry)}
       </div>
-      <div class="row-right" style="flex-direction:column;align-items:flex-end;gap:4px">
+      <div class="row-right" style="flex-direction:column;align-items:flex-end;gap:4px;margin-left:10px">
         ${badgeHtml(st, days)}
-        <span style="font-family:var(--mono);font-size:12px;font-weight:600;color:${daysColor}">
-          ${days === null ? '—' : days < 0 ? Math.abs(days) + 'd ago' : days + 'd'}
-        </span>
+        <span style="font-family:var(--mono);font-size:11px;font-weight:600;color:${daysColor}">${daysLabel}</span>
       </div>
     </div>`;
   }).join('');
@@ -1019,21 +1102,31 @@ function renderCompliance(alerts) {
 }
 
 function renderInsurance() {
+  if (!document.getElementById('insuranceCards')) return;
   document.getElementById('insuranceCards').innerHTML = D.insurance.map(ins => {
     const days = daysUntil(ins.expiry);
     const st = statusFromDays(days);
     const borderColor = st === 'critical' || st === 'expired' ? 'var(--red)' : st === 'warning' ? 'var(--yellow)' : 'var(--border)';
+    const fields = [
+      ['Policy #', ins.policy || '—'],
+      ['Coverage', ins.coverage || '—'],
+      ['Expires', fmtDate(ins.expiry)],
+      ['Agent', ins.agent || '—'],
+      ['Phone', ins.agentPhone || '—'],
+    ];
+    if (ins.agentEmail) fields.push(['Email', `<a href="mailto:${ins.agentEmail}" style="color:var(--blue)">${ins.agentEmail}</a>`]);
     return `<div class="card" style="border-color:${borderColor}">
       <div class="card-head">
         <div>
           <div class="card-title">${ins.icon} ${ins.type}</div>
           <div class="card-sub">${ins.provider || 'Provider not set'}</div>
+          ${getDateStatusBadge(ins.expiry)}
         </div>
         ${badgeHtml(st, days)}
       </div>
       <div style="padding:14px 16px">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
-          ${[['Policy #', ins.policy || '—'], ['Coverage', ins.coverage || '—'], ['Expires', fmtDate(ins.expiry)], ['Agent', ins.agent || '—'], ['Agent Phone', ins.agentPhone || '—']].map(([l, v]) => `
+          ${fields.map(([l, v]) => `
             <div>
               <div style="font-size:9px;font-family:var(--mono);color:var(--muted2);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">${l}</div>
               <div style="font-size:13px;font-family:var(--mono)">${v}</div>
@@ -1077,6 +1170,7 @@ function saveInsurance() {
 }
 
 function renderDistributions() {
+  if (!document.getElementById('distList')) return;
   const dists2025 = D.distributions.filter(d => d.year === '2025');
   const total2025 = dists2025.reduce((s, d) => s + Number(d.amount || 0), 0);
   document.getElementById('distTotal2025').textContent = fmtMoney(total2025);
@@ -1134,6 +1228,7 @@ function removeDistribution(id) {
 }
 
 function renderChecklist() {
+  if (!document.getElementById('checklistContent')) return;
   const YEAR = '2025';
   const done = CHECKLIST.filter(i => D.checklist[i.id + '_' + YEAR]).length;
   const pct = Math.round((done / CHECKLIST.length) * 100);
@@ -1780,7 +1875,94 @@ File in: 06_CONTRACTS/${y}/Contract_[CLIENT]_[PROJECT].pdf
 }
 
 function printDoc() {
-  window.print();
+  const title = document.getElementById('docPreviewTitle')?.textContent || 'Document';
+  const content = document.getElementById('docPreviewContent')?.textContent || '';
+  const dueLabel = document.getElementById('docPreviewDue')?.textContent || '';
+
+  const jsPDFLib = (typeof window.jspdf !== 'undefined') ? window.jspdf.jsPDF : (typeof jsPDF !== 'undefined' ? jsPDF : null);
+  if (!jsPDFLib) { window.print(); return; }
+
+  const doc = new jsPDFLib({ orientation:'portrait', unit:'mm', format:'letter' });
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const margin = 20;
+  const contentW = pageW - margin * 2;
+  let y = margin;
+
+  // Header bar
+  doc.setFillColor(181, 110, 0);
+  doc.rect(0, 0, pageW, 12, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica', 'bold');
+  doc.text('START CONSTRUCTION, INC.  ·  CALIFORNIA S-CORPORATION  ·  EIN: 99-1788037', margin, 8);
+
+  y = 22;
+
+  // Title
+  doc.setTextColor(181, 110, 0);
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.text(title.toUpperCase(), margin, y);
+  y += 7;
+
+  if (dueLabel) {
+    doc.setTextColor(100, 100, 100);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.text(dueLabel, margin, y);
+    y += 5;
+  }
+
+  doc.setDrawColor(181, 110, 0);
+  doc.setLineWidth(0.5);
+  doc.line(margin, y, pageW - margin, y);
+  y += 7;
+
+  doc.setTextColor(30, 30, 30);
+  doc.setFontSize(9);
+  doc.setFont('courier', 'normal');
+
+  const lines = content.split('\n');
+  const lineH = 4.5;
+
+  for (const line of lines) {
+    if (y > pageH - margin - 15) {
+      doc.addPage();
+      y = margin + 8;
+    }
+    if (line.startsWith('===') || line.startsWith('---')) {
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.2);
+      doc.line(margin, y, pageW - margin, y);
+      y += lineH;
+    } else if (line.trim() === '') {
+      y += lineH * 0.5;
+    } else {
+      const isHeader = line.includes('───') || line.startsWith('RESOLVED') || line.startsWith('FURTHER') || (line === line.toUpperCase() && line.trim().length > 4 && !line.includes('$') && !line.includes(':'));
+      doc.setFont('courier', isHeader ? 'bold' : 'normal');
+      doc.setTextColor(isHeader ? 50 : 30, isHeader ? 50 : 30, isHeader ? 50 : 30);
+      const wrapped = doc.splitTextToSize(line, contentW);
+      doc.text(wrapped, margin, y);
+      y += wrapped.length * lineH;
+    }
+  }
+
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFillColor(245, 245, 245);
+    doc.rect(0, pageH - 12, pageW, 12, 'F');
+    doc.setTextColor(130, 130, 130);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Start Construction, Inc.  ·  CSLB #1123785  ·  EIN: 99-1788037  ·  2800 Walnut Ave Apt 43, Carmichael CA 95608', margin, pageH - 5);
+    doc.text(`Page ${i} of ${pageCount}`, pageW - margin, pageH - 5, { align:'right' });
+  }
+
+  const fileName = title.replace(/[^a-zA-Z0-9]/g, '_') + '_' + new Date().toISOString().slice(0,10) + '.pdf';
+  doc.save(fileName);
+  showToast('✓ PDF saved: ' + fileName);
 }
 
 
@@ -2044,30 +2226,35 @@ function deleteVendor(id) {
 // ── VAULT ──────────────────────────────────────────────────────────
 
 const GDRIVE_KEY = 'sc_gdrive_v2';
+const VAULT_KEY = 'sc_gdrive_v2';
 let vaultFilter = 'All';
 
 // Required documents list (matches what's in the screenshot + more)
 const REQUIRED_DOCS = [
-  { id:'articles',      label:'Articles of Incorporation',          icon:'🏛', category:'Formation' },
-  { id:'bylaws',        label:'Corporate Bylaws',                   icon:'📜', category:'Formation' },
-  { id:'ein',           label:'EIN / Tax ID Number Letter',         icon:'🔢', category:'Formation' },
-  { id:'2553',          label:'IRS Form 2553 (S-Corp Election)',    icon:'📋', category:'Formation' },
-  { id:'statement_inc', label:'Statement of the Incorporator',      icon:'📄', category:'Formation' },
-  { id:'biz_entity',    label:'Business Entity Filing Acknowledgment', icon:'📄', category:'Formation' },
-  { id:'banking_res',   label:'Banking Resolution',                 icon:'🏦', category:'Formation' },
-  { id:'meeting_min',   label:'Annual Meeting Minutes (current)',   icon:'🗓', category:'Corporate' },
-  { id:'si200',         label:'Statement of Information (SI-200)',  icon:'🏛', category:'Corporate' },
-  { id:'cslb_lic',      label:'CSLB Contractor License',            icon:'🔨', category:'Licenses' },
-  { id:'cslb_bond',     label:"Contractor's Bond Certificate",      icon:'🔗', category:'Licenses' },
-  { id:'gl_policy',     label:'General Liability Insurance Policy', icon:'🛡', category:'Insurance' },
-  { id:'wc_policy',     label:'Workers Compensation Policy',        icon:'👷', category:'Insurance' },
-  { id:'auto_policy',   label:'Commercial Auto Insurance',          icon:'🚗', category:'Insurance' },
-  { id:'w2_current',    label:'W-2 Current Year (self)',            icon:'💵', category:'Tax' },
-  { id:'1120s_current', label:'Form 1120-S Current Year',           icon:'📊', category:'Tax' },
-  { id:'ca100s_current',label:'CA Form 100S Current Year',          icon:'📊', category:'Tax' },
-  { id:'usps_1583',     label:'USPS Form 1583',                     icon:'📮', category:'Other' },
-  { id:'epa608',        label:'EPA 608 Universal Certification',    icon:'♻️', category:'Licenses' },
-  { id:'boir',          label:'BOIR (Beneficial Ownership Report)',  icon:'🏦', category:'Formation' },
+  // Formation
+  { id:'articles',      label:'Articles of Incorporation',              icon:'🏛', category:'Formation',  expiry:null, note:'Filed 02/26/2024' },
+  { id:'bylaws',        label:'Corporate Bylaws',                       icon:'📜', category:'Formation',  expiry:null },
+  { id:'ein',           label:'EIN / Tax ID Letter (SS-4)',             icon:'🔢', category:'Formation',  expiry:null, note:'EIN: 99-1788037' },
+  { id:'form2553',      label:'IRS Form 2553 (S-Corp Election)',        icon:'📋', category:'Formation',  expiry:null, note:'Effective 02/26/2024' },
+  { id:'statement_inc', label:'Statement of the Incorporator',          icon:'📄', category:'Formation',  expiry:null },
+  { id:'biz_entity',    label:'Business Entity Filing Acknowledgment',  icon:'📄', category:'Formation',  expiry:null },
+  { id:'banking_res',   label:'Banking Resolution',                     icon:'🏦', category:'Formation',  expiry:null },
+  { id:'boir',          label:'BOIR (Beneficial Ownership Report)',      icon:'🏦', category:'Formation',  expiry:null, note:'Filed 03/10/2024' },
+  // Corporate
+  { id:'meeting_min',   label:'Annual Meeting Minutes (current)',       icon:'🗓', category:'Corporate',  expiry:'2026-01-31', note:'Due annually Jan 31' },
+  { id:'si200',         label:'Statement of Information (SI-200)',      icon:'🏛', category:'Corporate',  expiry:'2027-02-28', note:'Filed 08/07/2025, due Feb annually' },
+  // Licenses
+  { id:'cslb_lic',      label:'CSLB Contractor License #1123785',       icon:'🔨', category:'Licenses',   expiry:null, note:'Check cslb.ca.gov for renewal date' },
+  { id:'epa608',        label:'EPA 608 Universal Certification',        icon:'♻️', category:'Licenses',   expiry:null, note:'OiNXMYM1DG — Universal (no expiry)' },
+  { id:'cslb_bond',     label:"Contractor's Bond Certificate",          icon:'🔗', category:'Licenses',   expiry:null, note:'$15,000 required by CSLB' },
+  // Insurance
+  { id:'wc_cert',       label:'Workers Comp (CWC03618700)',             icon:'👷', category:'Insurance',  expiry:'2026-10-03', note:'Clear Spring · Mark Florea (916) 964-0717' },
+  { id:'gl_cert',       label:'General Liability Insurance',            icon:'🛡', category:'Insurance',  expiry:null, note:'Pro-Builders Insurance Agency' },
+  { id:'auto_ins',      label:'Commercial Auto Insurance',              icon:'🚗', category:'Insurance',  expiry:null },
+  // Tax
+  { id:'withholding',   label:'CA Withholding Tax Requirements',        icon:'📊', category:'Tax',        expiry:null, note:'FTB notice, Entity: 6117165' },
+  // Other
+  { id:'usps_1583',     label:'USPS Form 1583',                         icon:'📮', category:'Other',      expiry:null, note:'PMB · 3400 Cottage Way Ste G2 #23147' },
 ];
 
 const FILE_CATEGORIES = ['All', 'Formation', 'Corporate', 'Licenses', 'Insurance', 'Tax', 'Payroll', 'Contracts', 'Other'];
@@ -2345,16 +2532,19 @@ function renderVault() {
     reqHtml += `<div style="font-size:9px;font-family:var(--mono);font-weight:700;color:${color};text-transform:uppercase;letter-spacing:2px;padding:12px 16px 4px;border-top:1px solid var(--border)">${cat}</div>`;
     catGroups[cat].forEach(req => {
       const uploaded = isUploaded(req);
+      const badge = getDateStatusBadge(req.expiry);
       reqHtml += `
-        <div class="req-row">
-          <div class="req-check ${uploaded ? 'uploaded' : 'missing'}">${uploaded ? '✓' : '?'}</div>
-          <div style="flex:1">
+        <div class="req-row" style="flex-wrap:wrap;gap:6px">
+          <div class="req-check ${uploaded ? 'uploaded' : 'missing'}" style="flex-shrink:0">${uploaded ? '✓' : '?'}</div>
+          <div style="flex:1;min-width:0">
             <div style="font-size:13px;font-weight:${uploaded?'600':'700'};color:${uploaded?'var(--muted2)':'var(--text)'}">${req.label}</div>
+            ${req.note ? `<div style="font-size:10px;color:var(--muted2);font-family:var(--mono);margin-top:2px">${req.note}</div>` : ''}
+            ${badge}
           </div>
-          ${!uploaded ? `<label style="cursor:pointer" title="Upload this file">
+          ${!uploaded ? `<label style="cursor:pointer;flex-shrink:0" title="Upload this file">
             <input type="file" style="display:none" onchange="handleFileUpload(event)">
             <span class="btn btn-ghost btn-sm">Upload</span>
-          </label>` : '<span style="font-size:12px;color:var(--green)">✓</span>'}
+          </label>` : ''}
         </div>`;
     });
   });
@@ -2362,20 +2552,30 @@ function renderVault() {
   document.getElementById('vaultRequiredList').innerHTML = reqHtml;
 }
 
-// Drag & drop support
-document.addEventListener('DOMContentLoaded', () => {
-  const label = document.getElementById('uploadLabel');
-  if (!label) return;
-  ['dragenter','dragover'].forEach(e => label.addEventListener(e, ev => { ev.preventDefault(); label.classList.add('drag-over'); }));
-  ['dragleave','drop'].forEach(e => label.addEventListener(e, ev => { ev.preventDefault(); label.classList.remove('drag-over'); }));
-  label.addEventListener('drop', ev => {
-    const dt = ev.dataTransfer;
-    if (dt && dt.files.length) {
-      const fakeEvent = { target: { files: dt.files, value:'' } };
-      handleFileUpload(fakeEvent);
-    }
+// Vault file upload init — called each time Vault page is shown
+function initVaultUpload() {
+  const oldInput = document.getElementById('vaultFileInput');
+  if (!oldInput) return;
+  // Clone to remove stale listeners
+  const input = oldInput.cloneNode(true);
+  oldInput.parentNode.replaceChild(input, oldInput);
+  input.addEventListener('change', e => {
+    if (e.target.files && e.target.files.length > 0) handleFileUpload(e);
   });
-});
+
+  const zone = document.getElementById('uploadDropZone');
+  if (!zone) return;
+  ['dragenter','dragover'].forEach(evt =>
+    zone.addEventListener(evt, e => { e.preventDefault(); zone.style.borderColor = 'var(--accent)'; zone.style.background = 'var(--accent-dim)'; })
+  );
+  ['dragleave','drop'].forEach(evt =>
+    zone.addEventListener(evt, e => { e.preventDefault(); zone.style.borderColor = 'var(--border2)'; zone.style.background = '#fff'; })
+  );
+  zone.addEventListener('drop', e => {
+    const files = e.dataTransfer?.files;
+    if (files?.length) handleFileUpload({ target: { files, value:'' } });
+  });
+}
 
 // ── INIT ──────────────────────────────────────────────────────────
 render();
