@@ -811,7 +811,9 @@ select option{background:#fff}
 <!-- TOAST -->
 <div class="toast" id="toast">✓ Saved</div>
 
+
 <script>
+
 // ── DATA ──────────────────────────────────────────────────────────
 const KEY = 'sc_pwa_v1';
 
@@ -1420,22 +1422,14 @@ function renderDocuments() {
 
   // Generator buttons
   const genDocs = [
-    { id:'annual_minutes',  icon:'🏛', label:'Annual Meeting
-Minutes' },
-    { id:'q1_resolution',   icon:'📄', label:'Q1 Distribution
-Resolution' },
-    { id:'q2_resolution',   icon:'📄', label:'Q2 Distribution
-Resolution' },
-    { id:'q3_resolution',   icon:'📄', label:'Q3 Distribution
-Resolution' },
-    { id:'q4_resolution',   icon:'📄', label:'Q4 Distribution
-Resolution' },
-    { id:'w9_request',      icon:'📋', label:'W-9 Request
-to Sub' },
-    { id:'major_decision',  icon:'⚖',  label:'Major Decision
-Resolution' },
-    { id:'client_contract', icon:'🔨', label:'Client Contract
-Template' },
+    { id:'annual_minutes',  icon:'🏛', label:`Annual Meeting\nMinutes` },
+    { id:'q1_resolution',   icon:'📄', label:`Q1 Distribution\nResolution` },
+    { id:'q2_resolution',   icon:'📄', label:`Q2 Distribution\nResolution` },
+    { id:'q3_resolution',   icon:'📄', label:`Q3 Distribution\nResolution` },
+    { id:'q4_resolution',   icon:'📄', label:`Q4 Distribution\nResolution` },
+    { id:'w9_request',      icon:'📋', label:`W-9 Request\nto Sub` },
+    { id:'major_decision',  icon:'⚖',  label:`Major Decision\nResolution` },
+    { id:'client_contract', icon:'🔨', label:`Client Contract\nTemplate` },
   ];
 
   document.getElementById('docButtons').innerHTML = genDocs.map(b => `
@@ -2579,6 +2573,7 @@ function initVaultUpload() {
 
 // ── INIT ──────────────────────────────────────────────────────────
 render();
+
 </script>
 </body>
 </html>

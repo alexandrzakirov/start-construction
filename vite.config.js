@@ -2,16 +2,15 @@ import { defineConfig } from 'vite'
 import { resolve } from 'path'
 
 export default defineConfig({
+  base: '/start-construction/',
   root: './',
   build: {
     outDir: 'dist',
     emptyOutDir: true,
-    minify: 'terser',
+    minify: true,
     sourcemap: false,
     rollupOptions: {
-      input: {
-        main: resolve(__dirname, 'index.html')
-      },
+      input: { main: resolve(__dirname, 'index.html') },
       output: {
         entryFileNames: 'js/[name]-[hash].js',
         chunkFileNames: 'js/[name]-[hash].js',
@@ -19,15 +18,6 @@ export default defineConfig({
       }
     }
   },
-  server: {
-    port: 5173,
-    open: true,
-    cors: true
-  },
-  preview: {
-    port: 4173
-  },
-  define: {
-    __VERSION__: JSON.stringify(process.env.npm_package_version)
-  }
+  server: { port: 5173, open: true, cors: true },
+  preview: { port: 4173 }
 })
